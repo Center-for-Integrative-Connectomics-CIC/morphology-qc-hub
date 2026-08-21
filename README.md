@@ -1,11 +1,9 @@
 # Morphology QC Hub
 
-A browser tool I use to visually quality-check single-neuron reconstructions while
-my collaborators and I label them. We trace neurons from raw stacks and annotate each
-node's compartment (soma / axon / basal dendrite / apical); this hub loads the labeled
-SWCs, drops them into the Allen mouse brain in 3D, and lets me sanity-check the labeling
-one neuron at a time — spotting an axon branch that got tagged as dendrite, a stray
-compartment, a soma in the wrong place — then jot notes, flag status, and export.
+A browser tool for visually quality-checking labeled single-neuron reconstructions of
+hippocampal neurons. It loads the labeled SWCs into the Allen mouse brain in 3D and lets
+you inspect each neuron's compartment labels one at a time — catching an axon branch
+tagged as dendrite or a soma in the wrong place — then flag status, add notes, and export.
 
 It currently holds **2,622 labeled neurons** across six hippocampal areas:
 
