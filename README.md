@@ -18,14 +18,13 @@ It currently holds **2,622 labeled neurons** across six hippocampal areas:
 
 ## Run it
 
-Everything is static — just serve the folder (fetch needs HTTP, not `file://`):
+Live: https://center-for-integrative-connectomics-cic.github.io/morphology-qc-hub/
+
+Or serve the folder locally:
 
 ```sh
 python3 -m http.server 8000
-# open http://localhost:8000
 ```
-
-three.js, the fonts, and the icons load from a CDN; the neuron/brain geometry is local.
 
 ## Using it
 

@@ -387,9 +387,14 @@
     function updateHud(){const n=AREAS.filter(a=>areaOn[a]).reduce((s,a)=>s+META.counts[a],0);document.getElementById('hud').innerHTML=`<b>${n.toLocaleString()}</b> neurons${selId?` · sel <b>${selId.replace(/_labeled$|_edited$/,'')}</b>`:''}`;}
 
     async function toggleArbors(){
-        const on=document.getElementById('tArbors').checked;
-        for(const a of AREAS) if(areaOn[a]) for(const id of order.filter(i=>NE[i].area===a)){const l=await loadArbor(id);l.visible=on&&id!==selId;}
-        if(!on) for(const[id,l]of arbors) l.visible=false;
+        const want=()=>document.getElementById('tArbors').checked;
+        if(!want()){ for(const[,l]of arbors) l.visible=false; return; }
+        for(const a of AREAS){
+            for(const id of order.filter(i=>NE[i].area===a)){
+                if(!want()){ for(const[,l]of arbors) l.visible=false; return; }
+                const l=await loadArbor(id); l.visible=want()&&areaOn[a]&&id!==selId;
+            }
+        }
     }
     document.getElementById('tArbors').onchange=toggleArbors;
     document.getElementById('tSoma').onchange=e=>{const on=e.target.checked;for(const a of AREAS)somaObj[a].visible=!(isolate&&activeG)&&areaOn[a]&&on;if(batchSomas)batchSomas.visible=on;};
