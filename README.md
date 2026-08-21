@@ -49,10 +49,6 @@ python3 -m http.server 8000
 LABELED_SETS=/path/to/labled_sets python3 build_hub.py
 ```
 
-Most areas are read as `<AREA>/**/*_labeled.swc`; CA1 sits in `hpf_ca1/` with a different
-convention (`*_edited.swc`, deduplicated by neuron id). Coordinates are Allen CCFv3
-microns; the build recentres them on the brain-shell centroid for display.
-
 ## Layout
 
 ```
