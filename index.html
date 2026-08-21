@@ -389,10 +389,13 @@
     async function toggleArbors(){
         const want=()=>document.getElementById('tArbors').checked;
         if(!want()){ for(const[,l]of arbors) l.visible=false; return; }
-        for(const a of AREAS){
-            for(const id of order.filter(i=>NE[i].area===a)){
+        const lists=AREAS.map(a=>order.filter(i=>NE[i].area===a));
+        const maxLen=Math.max(0,...lists.map(l=>l.length));
+        for(let k=0;k<maxLen;k++){
+            for(let ai=0;ai<AREAS.length;ai++){
+                const id=lists[ai][k]; if(id===undefined) continue;
                 if(!want()){ for(const[,l]of arbors) l.visible=false; return; }
-                const l=await loadArbor(id); l.visible=want()&&areaOn[a]&&id!==selId;
+                const l=await loadArbor(id); l.visible=want()&&areaOn[AREAS[ai]]&&id!==selId;
             }
         }
     }
