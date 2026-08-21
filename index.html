@@ -1,0 +1,467 @@
+<html lang="en-GB">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Morphology QC Hub</title>
+    <meta name="description" content="Interactive 3D atlas and QC tool for labeled single-neuron reconstructions across hippocampal areas (CA1, CA2, DG, POST, PRE, PARA) in the Allen CCF.">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=DM+Sans:opsz,wght@9..40,300..700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.7.2/css/all.min.css" rel="stylesheet">
+    <script type="importmap">
+    { "imports": {
+        "three": "https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.module.js",
+        "three/addons/": "https://cdn.jsdelivr.net/npm/three@0.160.0/examples/jsm/"
+    }}
+    </script>
+    <style>
+        :root{
+            --paper:#ffffff; --panel:#f5f6f5; --line:#e2e5e3; --ink:#14180f; --muted:#5c635a; --muted-2:#878d84;
+            --accent:#147d70; --accent-deep:#0e5b51; --accent-wash:#e8f4f1;
+            --serif:'Instrument Serif',Georgia,serif; --sans:'DM Sans',-apple-system,sans-serif; --mono:'JetBrains Mono',monospace;
+            --ca2:#e0403a; --dg:#f2b705; --post:#2e9e57; --pre:#2aa4e0; --para:#c840c8;
+            --pass:#2e9e57; --flag:#e0a020; --redo:#e0403a;
+        }
+        *{margin:0;padding:0;box-sizing:border-box}
+        html,body{height:100%}
+        body{font-family:var(--sans);color:var(--ink);background:var(--paper);overflow:hidden;font-size:14px}
+        .app{display:grid;grid-template-columns:340px 1fr;grid-template-rows:auto 1fr;height:100vh}
+
+        header.top{grid-column:1/3;display:flex;align-items:center;gap:16px;padding:11px 18px;border-bottom:1px solid var(--line);background:#fff;z-index:5}
+        header.top .brand{font-family:var(--serif);font-size:21px;line-height:1}
+        header.top .brand em{font-style:italic;color:var(--accent)}
+        header.top .sub{font-family:var(--mono);font-size:11px;color:var(--muted-2);letter-spacing:.3px;margin-top:3px}
+        header.top .spacer{flex:1}
+        header.top .btn{font-family:var(--mono);font-size:12px;color:var(--accent);background:#fff;border:1px solid var(--line);padding:7px 12px;border-radius:7px;cursor:pointer;display:inline-flex;align-items:center;gap:7px}
+        header.top .btn:hover{border-color:var(--accent)}
+
+        .panel{border-right:1px solid var(--line);display:flex;flex-direction:column;min-height:0;background:var(--panel)}
+        .controls{padding:12px 14px;border-bottom:1px solid var(--line);background:#fff;display:flex;flex-direction:column;gap:9px}
+        .search{width:100%;padding:8px 11px;border:1px solid var(--line);border-radius:7px;font-family:var(--sans);font-size:13px}
+        .search:focus{outline:none;border-color:var(--accent)}
+        .rowline{display:flex;gap:8px;align-items:center;flex-wrap:wrap}
+        .rowline select{font-family:var(--mono);font-size:11px;background:#fff;color:var(--ink);border:1px solid var(--line);border-radius:6px;padding:5px 7px}
+        .mini{font-family:var(--mono);font-size:11px;color:var(--muted-2);margin-left:auto}
+        .batchbar{display:flex;gap:6px}
+        .batchbar select{flex:1;font-family:var(--mono);font-size:11px;border:1px solid var(--line);border-radius:6px;padding:5px 6px;background:#fff}
+        .batchbar input{width:84px;font-family:var(--mono);font-size:11px;border:1px solid var(--line);border-radius:6px;padding:5px 6px}
+        .batchbar button{border:1px solid var(--accent);background:var(--accent);color:#fff;border-radius:6px;width:30px;cursor:pointer;font-weight:600}
+        .bacts{display:flex;flex-direction:column;gap:7px}
+        .bacts .brow{display:flex;gap:8px;align-items:center}
+        .bacts .brow .mini{margin-left:0}
+        .bacts #bCount{margin-left:auto}
+        .bacts #bAddSel{font-family:var(--mono);font-size:10.5px;padding:5px 9px;border:1px solid var(--accent);background:var(--accent-wash);color:var(--accent-deep);border-radius:6px;cursor:pointer}
+        .bacts .bbtns{display:flex;gap:5px;flex-wrap:wrap}
+        .bacts .bbtns button{flex:1;min-width:44px;font-family:var(--mono);font-size:10.5px;padding:6px 3px;border:1px solid var(--line);background:#fff;border-radius:6px;cursor:pointer;color:var(--muted)}
+        .bacts .bbtns button:hover{border-color:var(--accent);color:var(--accent)}
+        .bacts textarea{width:100%;min-height:42px;font-family:var(--sans);font-size:12px;padding:7px;border:1px solid var(--line);border-radius:6px;resize:vertical}
+
+        .grouplist{flex:1;overflow-y:auto;min-height:0}
+        .grp{border-bottom:1px solid var(--line)}
+        .grp-head{display:flex;align-items:center;gap:9px;padding:9px 13px;cursor:pointer;user-select:none;background:#fff}
+        .grp-head:hover{background:var(--accent-wash)}
+        .grp-head .sw{width:12px;height:12px;border-radius:3px;flex:none}
+        .grp-head .nm{font-weight:600;font-size:13px}
+        .grp-head .cnt{margin-left:auto;font-family:var(--mono);font-size:11px;color:var(--muted-2)}
+        .grp-head .chev{font-size:10px;color:var(--muted-2);transition:transform .15s;width:10px}
+        .grp.open .chev{transform:rotate(90deg)}
+        .grp-body{display:none}
+        .grp.open .grp-body{display:block}
+        .nrow{display:flex;align-items:center;gap:8px;padding:6px 13px 6px 30px;cursor:pointer;font-size:12px;border-top:1px solid var(--line)}
+        .nrow:hover{background:var(--accent-wash)}
+        .nrow.on{background:#eaf5f2}
+        .nrow .dot{width:9px;height:9px;border-radius:50%;flex:none;border:1px solid rgba(0,0,0,.15)}
+        .nrow .id{font-family:var(--mono);font-size:11.5px}
+        .nrow.on .id{font-weight:600;color:var(--accent-deep)}
+        .nrow .tg{margin-left:auto;font-family:var(--mono);font-size:10px;color:var(--muted-2);display:flex;gap:6px;align-items:center}
+        .nrow .st{font-size:9.5px;padding:1px 6px;border-radius:9px;border:1px solid var(--line);color:var(--muted-2)}
+        .nrow .st.pass{color:var(--pass);border-color:var(--pass)} .nrow .st.flag{color:var(--flag);border-color:var(--flag)} .nrow .st.redo{color:var(--redo);border-color:var(--redo)}
+        .nrow .ni{color:var(--accent)}
+        .grp-more{padding:7px 13px 7px 30px;font-family:var(--mono);font-size:10.5px;color:var(--muted-2);border-top:1px solid var(--line)}
+
+        .stage{position:relative;min-width:0;background:radial-gradient(ellipse at 50% 34%,#1b2733 0%,#0c1116 100%)}
+        #gl{position:absolute;top:0;left:0;width:100%;height:100%;display:block}
+        .legend{position:absolute;top:14px;left:14px;background:rgba(12,17,22,.72);backdrop-filter:blur(6px);border:1px solid rgba(255,255,255,.1);border-radius:9px;padding:11px 13px;color:#dfe6e2}
+        .legend h4{font-family:var(--mono);font-size:10px;letter-spacing:1px;text-transform:uppercase;color:#8fb8b0;margin-bottom:8px;font-weight:500}
+        .legend .item{display:flex;align-items:center;gap:8px;font-size:12px;margin:4px 0;cursor:pointer}
+        .legend .item.off{opacity:.4}
+        .legend .sw{width:12px;height:12px;border-radius:3px;border:1px solid rgba(255,255,255,.15)}
+        .legend .item .c{margin-left:auto;font-family:var(--mono);font-size:10.5px;color:#8fb8b0}
+        .toggles{position:absolute;top:186px;left:14px;display:flex;flex-direction:column;gap:7px;align-items:flex-start;z-index:4}
+        .toggles label{display:flex;align-items:center;gap:7px;font-family:var(--mono);font-size:11px;color:#cdd8d3;background:rgba(12,17,22,.66);padding:6px 10px;border-radius:7px;border:1px solid rgba(255,255,255,.08);cursor:pointer}
+        .toggles input{accent-color:var(--accent)}
+        .toggles .tdiv{font-family:var(--mono);font-size:9px;letter-spacing:1px;text-transform:uppercase;color:#7f938c;margin-top:5px;padding-left:2px}
+        .toggles .csw{width:9px;height:9px;border-radius:2px;display:inline-block;flex:none}
+        #qcReopen{display:none;position:absolute;top:64px;right:14px;z-index:5;align-items:center;gap:7px;font-family:var(--mono);font-size:11px;color:#0c1116;background:var(--accent);padding:8px 12px;border-radius:8px;border:none;cursor:pointer;font-weight:600;box-shadow:0 6px 18px rgba(0,0,0,.35)}
+        #qcReopen:hover{background:#18988a}
+        #fitBtn{display:flex;align-items:center;gap:7px;font-family:var(--mono);font-size:11px;color:#0c1116;background:var(--accent);padding:7px 11px;border-radius:7px;border:none;cursor:pointer;font-weight:600}
+        #fitBtn:hover{background:#18988a}
+        .hud{position:absolute;bottom:12px;left:14px;font-family:var(--mono);font-size:11px;color:#9fb0aa;background:rgba(12,17,22,.6);padding:6px 10px;border-radius:7px}
+        .hud b{color:#e6efe9}
+        .hint{position:absolute;bottom:12px;right:14px;font-family:var(--mono);font-size:10.5px;color:#7f938c}
+        .loading{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;color:#9fb0aa;font-family:var(--mono);font-size:13px;pointer-events:none;transition:opacity .3s}
+
+        .qc{position:absolute;top:64px;right:14px;width:290px;max-height:calc(100% - 84px);overflow-y:auto;background:#fff;border:1px solid var(--line);border-radius:11px;box-shadow:0 14px 40px rgba(0,0,0,.4);display:none;z-index:5}
+        .qc.on{display:block}
+        .qc .h{padding:13px 15px;border-bottom:1px solid var(--line)}
+        .qc .h .id{font-family:var(--mono);font-size:13.5px;word-break:break-all;color:var(--ink)}
+        .qc .h .a{font-family:var(--mono);font-size:11px;margin-top:5px;display:inline-flex;align-items:center;gap:6px;color:var(--muted)}
+        .qc .h .x{float:right;cursor:pointer;color:var(--muted-2);font-size:14px}
+        .qc .b{padding:13px 15px}
+        .qc h5{font-family:var(--mono);font-size:9.5px;letter-spacing:1px;text-transform:uppercase;color:var(--muted-2);margin:14px 0 7px}
+        .qc h5:first-child{margin-top:0}
+        .qc .stats{display:grid;grid-template-columns:1fr 1fr;gap:7px 12px;font-family:var(--mono)}
+        .qc .stats .v{font-size:14px;color:var(--ink)} .qc .stats .k{font-size:10px;color:var(--muted-2)}
+        .qc .comp{display:flex;gap:5px;flex-wrap:wrap}
+        .qc .comp span{font-family:var(--mono);font-size:10px;padding:3px 7px;border-radius:9px;background:var(--panel);border:1px solid var(--line);color:var(--muted)}
+        .qc .qcb{display:flex;gap:6px}
+        .qc .qcb button{flex:1;font-family:var(--mono);font-size:11px;padding:7px;border-radius:6px;border:1px solid var(--line);background:#fff;color:var(--muted);cursor:pointer}
+        .qc .qcb button.on[data-s=pass]{background:var(--pass);color:#fff;border-color:var(--pass)}
+        .qc .qcb button.on[data-s=flag]{background:var(--flag);color:#fff;border-color:var(--flag)}
+        .qc .qcb button.on[data-s=redo]{background:var(--redo);color:#fff;border-color:var(--redo)}
+        .qc textarea{width:100%;min-height:74px;font-family:var(--sans);font-size:12.5px;padding:9px;border:1px solid var(--line);border-radius:6px;resize:vertical}
+        .qc .saved{font-family:var(--mono);font-size:9.5px;color:var(--muted-2);margin-top:4px}
+        .qc .acts{display:flex;gap:7px;margin-top:7px}
+        .qc .acts a,.qc .acts button{flex:1;font-family:var(--mono);font-size:11px;padding:8px;border-radius:6px;border:1px solid var(--line);background:#fff;color:var(--accent);text-align:center;cursor:pointer;display:inline-flex;align-items:center;justify-content:center;gap:6px;text-decoration:none}
+        .qc .acts a.pri{background:var(--accent);color:#fff;border-color:var(--accent);font-weight:600}
+        .qc .acts .on{background:var(--accent-wash);border-color:var(--accent);color:var(--accent-deep)}
+        @media (max-width:900px){.app{grid-template-columns:1fr;grid-template-rows:auto 42vh 1fr}.panel{grid-row:3}.qc{width:250px}}
+    </style>
+</head>
+<body>
+<div class="app">
+    <header class="top">
+        <div>
+            <div class="brand">Morphology <em>QC Hub</em></div>
+        </div>
+        <div class="spacer"></div>
+        <button class="btn" id="btnExport"><i class="fa-solid fa-file-export"></i> Export QC</button>
+    </header>
+
+    <aside class="panel">
+        <div class="controls">
+            <input class="search" id="search" placeholder="Filter by neuron ID / set…">
+            <div class="rowline">
+                <select id="fStatus"><option value="">any QC</option><option value="unreviewed">unreviewed</option><option value="pass">pass</option><option value="flag">flag</option><option value="redo">redo</option></select>
+                <select id="fSort"><option value="id">sort: id</option><option value="len_um">length</option><option value="axon_um">axon</option><option value="n_nodes">nodes</option></select>
+                <span class="mini" id="listCount"></span>
+            </div>
+            <div class="batchbar">
+                <select id="bSel" title="active batch"><option value="">— batch: none —</option></select>
+                <input id="bNew" placeholder="new batch">
+                <button id="bAdd" title="create batch">＋</button>
+            </div>
+            <div class="bacts" id="bacts" style="display:none">
+                <div class="brow"><label class="mini"><input type="checkbox" id="bIsolate"> isolate</label><button id="bAddSel">＋ add selected</button><span class="mini" id="bCount"></span></div>
+                <div class="bbtns">
+                    <button data-s="pass">✓ all</button><button data-s="flag">⚑ all</button><button data-s="redo">✗ all</button>
+                    <button id="bExport">⇩ CSV</button><button id="bDownload">⇩ SWC</button><button id="bDel">🗑 del</button>
+                </div>
+                <textarea id="bNote" placeholder="batch note…"></textarea>
+            </div>
+        </div>
+        <div class="grouplist" id="grouplist"></div>
+    </aside>
+
+    <div class="stage">
+        <canvas id="gl"></canvas>
+        <div class="legend" id="legend"><h4>areas · click to toggle</h4></div>
+        <div class="toggles">
+            <button id="fitBtn" title="Recentre &amp; fit the whole brain"><i class="fa-solid fa-expand"></i> fit view</button>
+            <label><input type="checkbox" id="tBrain" checked> brain shell</label>
+            <label><input type="checkbox" id="tSoma" checked> soma markers</label>
+            <label><input type="checkbox" id="tArbors"> all arbors</label>
+            <div class="tdiv">compartments (sel.)</div>
+            <label><input type="checkbox" class="tComp" data-c="axon" checked> <i class="csw" style="background:#4aa3ff"></i> axon</label>
+            <label><input type="checkbox" class="tComp" data-c="basal" checked> <i class="csw" style="background:#ff5d5d"></i> basal dendrite</label>
+            <label><input type="checkbox" class="tComp" data-c="apical" checked> <i class="csw" style="background:#ffd23a"></i> apical dendrite</label>
+        </div>
+        <button id="qcReopen" title="Show info panel"><i class="fa-solid fa-circle-info"></i> info panel</button>
+        <div class="hud" id="hud"><b>0</b> neurons</div>
+        <div class="hint">drag rotate · scroll zoom · right-drag pan · click a soma</div>
+        <div class="loading" id="loading">loading atlas…</div>
+
+        <div class="qc" id="qc">
+            <div class="h">
+                <span class="x" id="qcClose"><i class="fa-solid fa-xmark"></i></span>
+                <div class="id" id="qId"></div>
+                <div class="a" id="qArea"></div>
+            </div>
+            <div class="b">
+                <h5>Reconstruction</h5>
+                <div class="stats" id="qStats"></div>
+                <h5>Compartments (SWC types)</h5>
+                <div class="comp" id="qComp"></div>
+                <h5>QC status</h5>
+                <div class="qcb" id="qStatus"><button data-s="pass">✓ pass</button><button data-s="flag">⚑ flag</button><button data-s="redo">✗ redo</button></div>
+                <h5>Notes</h5>
+                <textarea id="qNotes" placeholder="QC notes (saved in your browser)…"></textarea>
+                <div class="saved" id="qSaved"></div>
+                <h5>Actions</h5>
+                <div class="acts"><a class="pri" id="qDl" download><i class="fa-solid fa-download"></i> SWC</a><button id="qFly"><i class="fa-solid fa-crosshairs"></i> fly to</button></div>
+                <div class="acts"><button id="qBatch"><i class="fa-solid fa-layer-group"></i> add to batch</button></div>
+                <div class="saved" id="qBatchInfo"></div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script type="module">
+    import * as THREE from 'three';
+    import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
+
+    const AC = { CA1:0xf2762e, CA2:0xe0403a, DG:0xf2b705, POST:0x2e9e57, PRE:0x2aa4e0, PARA:0xc840c8 };
+    const AHEX = { CA1:'#f2762e', CA2:'#e0403a', DG:'#f2b705', POST:'#2e9e57', PRE:'#2aa4e0', PARA:'#c840c8' };
+    const DATA='data/', SWC='data/swc/', QKEY='pdh_qc_v1';
+    let META, NE, AREAS, order=[];
+    const qc = JSON.parse(localStorage.getItem(QKEY)||'{}');
+    const areaOn = {CA1:1,CA2:1,DG:1,POST:1,PRE:1,PARA:1};
+    const openGrp = {};
+    let selId=null;
+
+    const canvas=document.getElementById('gl');
+    const scene=new THREE.Scene();
+    const renderer=new THREE.WebGLRenderer({canvas,antialias:true,alpha:true});
+    renderer.setPixelRatio(Math.min(devicePixelRatio,2));
+    const camera=new THREE.PerspectiveCamera(45,2,0.01,5000); camera.position.set(5,3.2,12);
+    const controls=new OrbitControls(camera,canvas); controls.enableDamping=true; controls.rotateSpeed=0.85;
+    scene.add(new THREE.AmbientLight(0xffffff,0.9));
+    const dl=new THREE.DirectionalLight(0xffffff,0.5); dl.position.set(1,1,1); scene.add(dl);
+    const root=new THREE.Group(); scene.add(root);
+
+    async function loadBin(url){
+        const buf=await (await fetch(url)).arrayBuffer();
+        const dv=new DataView(buf); const nP=dv.getUint32(0,true), nE=dv.getUint32(4,true);
+        const base=8+nP*12; const P=new Float32Array(buf,8,nP*3);
+        if(buf.byteLength===base+nE*12) return {P,nP,E:new Uint32Array(buf,base,nE*3),nE,T:null};
+        return {P,nP,E:new Uint32Array(buf,base,nE*2),nE,T:new Uint8Array(buf,base+nE*8,nP)};
+    }
+    const TYPE_HEX={soma:'#efefef',axon:'#4aa3ff',dendrite:'#ff5d5d',apical:'#ffd23a',c10:'#b06bff',c11:'#35c46a',c12:'#ff9f45',undef:'#8a8f96'};
+    const NUM_NAME={1:'soma',2:'axon',3:'dendrite',4:'apical',10:'c10',11:'c11',12:'c12',0:'undef'};
+    const NUM_COL={}; for(const k in NUM_NAME) NUM_COL[k]=new THREE.Color(TYPE_HEX[NUM_NAME[k]]);
+    const lineGeom=(P,E)=>{const g=new THREE.BufferGeometry();g.setAttribute('position',new THREE.BufferAttribute(P,3));g.setIndex(new THREE.BufferAttribute(E,1));return g;};
+    const meshGeom=(P,E)=>{const g=new THREE.BufferGeometry();g.setAttribute('position',new THREE.BufferAttribute(P,3));g.setIndex(new THREE.BufferAttribute(E,1));g.computeVertexNormals();return g;};
+
+    const somaObj={};
+    function buildSomas(){
+        for(const a of AREAS){
+            const ids=order.filter(id=>NE[id].area===a);
+            const pos=new Float32Array(ids.length*3);
+            ids.forEach((id,i)=>{const s=NE[id].soma;pos[i*3]=s[0];pos[i*3+1]=s[1];pos[i*3+2]=s[2];});
+            const g=new THREE.BufferGeometry(); g.setAttribute('position',new THREE.BufferAttribute(pos,3)); g.userData.ids=ids;
+            const pts=new THREE.Points(g,new THREE.PointsMaterial({color:AC[a],size:4.5,sizeAttenuation:false}));
+            pts.userData.area=a; root.add(pts); somaObj[a]=pts;
+        }
+    }
+    const areaMat={}; for(const a in AC) areaMat[a]=new THREE.LineBasicMaterial({color:AC[a],transparent:true,opacity:0.82});
+    const arbors=new Map();
+
+    const COMP_CLASS = t => t===2?'axon' : t===3?'basal' : t===4?'apical' : 'other';
+    const compVis = {axon:true, basal:true, apical:true, other:true};
+    const selComp = new THREE.Group(); root.add(selComp);
+    function clearSelComp(){ while(selComp.children.length){const c=selComp.children.pop();c.geometry.dispose();c.material.dispose();} }
+    function applyCompVis(){ for(const ln of selComp.children) ln.visible=compVis[ln.userData.cls]; }
+    function displayTypes(b){
+        const T=b.T?Uint8Array.from(b.T):new Uint8Array(b.nP);
+        if(!b.T) return T;
+        const nbr=Array.from({length:b.nP},()=>[]);
+        for(let k=0;k<b.nE;k++){const a=b.E[k*2],c=b.E[k*2+1]; nbr[a].push(c); nbr[c].push(a);}
+        for(let i=0;i<b.nP;i++){
+            const ns=nbr[i]; if(!ns.length) continue;
+            if(ns.every(j=>b.T[j]!==b.T[i])){
+                const cnt={}; let best=b.T[ns[0]],bc=0;
+                for(const j of ns){const t=b.T[j]; cnt[t]=(cnt[t]||0)+1; if(cnt[t]>bc){bc=cnt[t];best=t;}}
+                T[i]=best;
+            }
+        }
+        return T;
+    }
+    async function buildSelComp(id){
+        clearSelComp();
+        const b=await loadBin(SWC+id+'.bin');
+        const DT=displayTypes(b);
+        const pos=new THREE.BufferAttribute(b.P,3);
+        const col=new Float32Array(b.nP*3);
+        for(let i=0;i<b.nP;i++){const c=NUM_COL[DT[i]]||NUM_COL[0]; col[i*3]=c.r;col[i*3+1]=c.g;col[i*3+2]=c.b;}
+        const colAttr=new THREE.BufferAttribute(col,3);
+        const buckets={axon:[],basal:[],apical:[],other:[]};
+        for(let k=0;k<b.nE;k++){const a=b.E[k*2],c=b.E[k*2+1]; buckets[COMP_CLASS(DT[c])].push(a,c);}
+        for(const cls in buckets){
+            if(!buckets[cls].length) continue;
+            const g=new THREE.BufferGeometry(); g.setAttribute('position',pos); g.setAttribute('color',colAttr); g.setIndex(buckets[cls]);
+            const ln=new THREE.LineSegments(g,new THREE.LineBasicMaterial({vertexColors:true,transparent:true,opacity:0.95}));
+            ln.userData.cls=cls; ln.visible=compVis[cls]; selComp.add(ln);
+        }
+    }
+    document.querySelectorAll('.tComp').forEach(cb=>cb.onchange=()=>{compVis[cb.dataset.c]=cb.checked;applyCompVis();});
+    async function loadArbor(id){
+        if(arbors.has(id))return arbors.get(id);
+        const b=await loadBin(SWC+id+'.bin'); const g=lineGeom(b.P,b.E);
+        if(b.T){ const col=new Float32Array(b.nP*3); for(let i=0;i<b.nP;i++){const c=NUM_COL[b.T[i]]||NUM_COL[0]; col[i*3]=c.r;col[i*3+1]=c.g;col[i*3+2]=c.b;} g.setAttribute('color',new THREE.BufferAttribute(col,3)); }
+        const line=new THREE.LineSegments(g,areaMat[NE[id].area]); line.userData.area=NE[id].area;
+        line.visible=false; root.add(line); arbors.set(id,line); return line;
+    }
+    let selMarker;
+
+    async function select(id){
+        const bulk=document.getElementById('tArbors').checked;
+        if(selId && arbors.has(selId)) arbors.get(selId).visible=bulk;
+        selId=id; const n=NE[id];
+        selMarker.position.set(n.soma[0],n.soma[1],n.soma[2]); selMarker.visible=true;
+        const line=await loadArbor(id); line.visible=false;
+        await buildSelComp(id);
+        renderQC(id); renderList(); updateHud();
+    }
+
+    const ray=new THREE.Raycaster(); ray.params.Points.threshold=0.05;
+    const mouse=new THREE.Vector2(); let downXY=null;
+    canvas.addEventListener('pointerdown',e=>downXY=[e.clientX,e.clientY]);
+    canvas.addEventListener('pointerup',e=>{
+        if(!downXY||Math.hypot(e.clientX-downXY[0],e.clientY-downXY[1])>5)return;
+        const r=canvas.getBoundingClientRect();
+        mouse.x=((e.clientX-r.left)/r.width)*2-1; mouse.y=-((e.clientY-r.top)/r.height)*2+1;
+        ray.setFromCamera(mouse,camera);
+        let best=null,bd=1e9;
+        for(const a of AREAS){ if(!areaOn[a]||!somaObj[a].visible)continue; const hit=ray.intersectObject(somaObj[a]);
+            if(hit.length&&hit[0].distanceToRay<bd){bd=hit[0].distanceToRay;best=somaObj[a].geometry.userData.ids[hit[0].index];} }
+        if(batchSomas&&batchSomas.visible){const hit=ray.intersectObject(batchSomas);if(hit.length&&hit[0].distanceToRay<bd){bd=hit[0].distanceToRay;best=batchSomas.geometry.userData.ids[hit[0].index];}}
+        if(best)select(best);
+    });
+
+    function renderQC(id){
+        const n=NE[id]; document.getElementById('qc').classList.add('on'); document.getElementById('qcReopen').style.display='none';
+        document.getElementById('qId').textContent=id;
+        document.getElementById('qArea').innerHTML=`<span style="width:10px;height:10px;border-radius:50%;background:${AHEX[n.area]};display:inline-block"></span> ${n.area} · set ${n.set}`;
+        const st=[['nodes',n.n_nodes.toLocaleString()],['length µm',Math.round(n.len_um).toLocaleString()],['axon µm',Math.round(n.axon_um).toLocaleString()],['branches',n.n_branches],['tips',n.n_tips],['roots',n.n_roots]];
+        document.getElementById('qStats').innerHTML=st.map(s=>`<div><div class="v">${s[1]}</div><div class="k">${s[0]}</div></div>`).join('');
+        document.getElementById('qComp').innerHTML=Object.entries(n.types).map(([k,v])=>`<span><i style="display:inline-block;width:8px;height:8px;border-radius:50%;background:${TYPE_HEX[k]||'#8a8f96'};margin-right:5px;vertical-align:middle"></i>${k}: ${v.toLocaleString()}</span>`).join('');
+        const q=qc[id]||{};
+        document.querySelectorAll('#qStatus button').forEach(b=>b.classList.toggle('on',b.dataset.s===q.status));
+        document.getElementById('qNotes').value=q.notes||'';
+        document.getElementById('qSaved').textContent=q.ts?'saved '+new Date(q.ts).toLocaleString():'';
+        const dl=document.getElementById('qDl'); dl.href=n.src; dl.setAttribute('download',id+'.swc');
+        const inB=Object.keys(groups).filter(g=>groups[g].ids.includes(id));
+        document.getElementById('qBatch').classList.toggle('on', activeG&&groups[activeG].ids.includes(id));
+        document.getElementById('qBatchInfo').textContent=(activeG?('active batch: '+activeG):'no active batch — will create one')+(inB.length?(' · in: '+inB.join(', ')):'');
+    }
+    document.getElementById('qStatus').onclick=e=>{const b=e.target.closest('button');if(!b||!selId)return;const q=qc[selId]||{};q.status=(q.status===b.dataset.s?null:b.dataset.s);q.ts=Date.now();qc[selId]=q;save();renderQC(selId);renderList();};
+    document.getElementById('qNotes').oninput=e=>{if(!selId)return;const q=qc[selId]||{};q.notes=e.target.value;q.ts=Date.now();qc[selId]=q;save();document.getElementById('qSaved').textContent='saved just now';renderList();};
+    document.getElementById('qcClose').onclick=()=>{document.getElementById('qc').classList.remove('on'); document.getElementById('qcReopen').style.display=selId?'inline-flex':'none';};
+    document.getElementById('qcReopen').onclick=()=>{if(!selId)return; document.getElementById('qc').classList.add('on'); document.getElementById('qcReopen').style.display='none';};
+    document.getElementById('qFly').onclick=()=>{if(!selId)return;const s=NE[selId].soma;const d=camera.position.clone().sub(controls.target);controls.target.set(s[0],s[1],s[2]);camera.position.copy(controls.target).add(d.setLength(2.2));};
+    function save(){localStorage.setItem(QKEY,JSON.stringify(qc));}
+
+    function statusOf(id){return (qc[id]||{}).status||'unreviewed';}
+    function filteredFor(a){
+        const q=document.getElementById('search').value.trim().toLowerCase();
+        const fs=document.getElementById('fStatus').value, so=document.getElementById('fSort').value;
+        let f=order.filter(id=>NE[id].area===a);
+        if(isolate&&activeG) f=f.filter(id=>groups[activeG].ids.includes(id));
+        if(fs) f=f.filter(id=> fs==='unreviewed'?statusOf(id)==='unreviewed':statusOf(id)===fs);
+        if(q) f=f.filter(id=>id.toLowerCase().includes(q)||NE[id].set.toLowerCase().includes(q));
+        f.sort((x,y)=> so==='id'?x.localeCompare(y):NE[y][so]-NE[x][so]);
+        return f;
+    }
+    function renderList(){
+        let total=0;
+        document.getElementById('grouplist').innerHTML=AREAS.map(a=>{
+            const f=filteredFor(a); total+=f.length; const op=openGrp[a];
+            const rows = op ? f.slice(0,150).map(id=>{
+                const n=NE[id],q=qc[id]||{},s=q.status;
+                return `<div class="nrow ${id===selId?'on':''}" data-id="${id}"><span class="dot" style="background:${AHEX[a]}"></span><span class="id">${id.replace(/_labeled$|_edited$/,'')}</span><span class="tg">${Math.round(n.len_um/1000)}mm ${s?`<span class="st ${s}">${s}</span>`:''}${q.notes?'<i class="fa-solid fa-note-sticky ni"></i>':''}</span></div>`;
+            }).join('') + (f.length>150?`<div class="grp-more">+${f.length-150} more — filter to narrow</div>`:'') : '';
+            return `<div class="grp ${op?'open':''}" data-a="${a}">
+                <div class="grp-head" data-a="${a}"><span class="chev">▶</span><span class="sw" style="background:${AHEX[a]}"></span><span class="nm">${a}</span><span class="cnt">${f.length}</span></div>
+                <div class="grp-body">${rows}</div></div>`;
+        }).join('');
+        document.getElementById('listCount').textContent=total+' shown';
+        document.querySelectorAll('.grp-head').forEach(h=>h.onclick=()=>{const a=h.dataset.a;openGrp[a]=!openGrp[a];renderList();});
+        document.querySelectorAll('.nrow').forEach(r=>r.onclick=()=>select(r.dataset.id));
+    }
+    ['search','fStatus','fSort'].forEach(id=>document.getElementById(id).addEventListener('input',renderList));
+
+    function buildLegend(){
+        document.getElementById('legend').innerHTML='<h4>areas · click to toggle</h4>'+AREAS.map(a=>`<div class="item" data-a="${a}"><span class="sw" style="background:${AHEX[a]}"></span>${a}<span class="c">${META.counts[a]}</span></div>`).join('');
+        document.querySelectorAll('.legend .item').forEach(it=>it.onclick=()=>{const a=it.dataset.a;areaOn[a]=!areaOn[a];it.classList.toggle('off',!areaOn[a]);somaObj[a].visible=areaOn[a]&&document.getElementById('tSoma').checked; if(document.getElementById('tArbors').checked)toggleArbors(); updateHud();});
+    }
+    function updateHud(){const n=AREAS.filter(a=>areaOn[a]).reduce((s,a)=>s+META.counts[a],0);document.getElementById('hud').innerHTML=`<b>${n.toLocaleString()}</b> neurons${selId?` · sel <b>${selId.replace(/_labeled$|_edited$/,'')}</b>`:''}`;}
+
+    async function toggleArbors(){
+        const on=document.getElementById('tArbors').checked;
+        for(const a of AREAS) if(areaOn[a]) for(const id of order.filter(i=>NE[i].area===a)){const l=await loadArbor(id);l.visible=on&&id!==selId;}
+        if(!on) for(const[id,l]of arbors) l.visible=false;
+    }
+    document.getElementById('tArbors').onchange=toggleArbors;
+    document.getElementById('tSoma').onchange=e=>{const on=e.target.checked;for(const a of AREAS)somaObj[a].visible=!(isolate&&activeG)&&areaOn[a]&&on;if(batchSomas)batchSomas.visible=on;};
+
+    document.getElementById('btnExport').onclick=()=>{
+        const rows=[['id','area','set','status','notes','updated','src']];
+        for(const id of order){const q=qc[id];if(!q)continue;rows.push([id,NE[id].area,NE[id].set,q.status||'',(q.notes||'').replace(/[\n,]/g,' '),q.ts?new Date(q.ts).toISOString():'',NE[id].src]);}
+        const a=document.createElement('a');a.href=URL.createObjectURL(new Blob([rows.map(r=>r.map(x=>`"${x}"`).join(',')).join('\n')],{type:'text/csv'}));a.download='projectome_qc_export.csv';a.click();
+    };
+
+    const GKEY='pdh_groups_v1';
+    let groups=JSON.parse(localStorage.getItem(GKEY)||'{}'); let activeG=''; let isolate=false; let batchSomas=null;
+    const saveG=()=>localStorage.setItem(GKEY,JSON.stringify(groups));
+    function renderBatch(){
+        document.getElementById('bSel').innerHTML='<option value="">— batch: none —</option>'+Object.keys(groups).map(g=>`<option value="${g}" ${g===activeG?'selected':''}>${g} (${groups[g].ids.length})</option>`).join('');
+        document.getElementById('bacts').style.display=activeG?'flex':'none';
+        if(activeG){const G=groups[activeG];document.getElementById('bCount').textContent=G.ids.length+' in batch';document.getElementById('bNote').value=G.note||'';document.getElementById('bIsolate').checked=isolate;}
+        applyIsolate();
+    }
+    function applyIsolate(){
+        if(batchSomas){root.remove(batchSomas);batchSomas.geometry.dispose();batchSomas.material.dispose();batchSomas=null;}
+        const iso=isolate&&activeG, showSoma=document.getElementById('tSoma').checked;
+        for(const a of AREAS) somaObj[a].visible=!iso&&areaOn[a]&&showSoma;
+        if(iso){
+            const ids=groups[activeG].ids, pos=new Float32Array(ids.length*3);
+            ids.forEach((id,i)=>{const p=NE[id].soma;pos[i*3]=p[0];pos[i*3+1]=p[1];pos[i*3+2]=p[2];});
+            const g=new THREE.BufferGeometry();g.setAttribute('position',new THREE.BufferAttribute(pos,3));g.userData.ids=ids;
+            batchSomas=new THREE.Points(g,new THREE.PointsMaterial({color:0xffffff,size:6.5,sizeAttenuation:false}));batchSomas.visible=showSoma;root.add(batchSomas);
+            for(const[id,l]of arbors) l.visible=ids.includes(id)&&id!==selId;
+            if(document.getElementById('tArbors').checked) ids.forEach(id=>{if(id!==selId)loadArbor(id).then(l=>{l.visible=true;});});
+        } else if(!document.getElementById('tArbors').checked){ for(const[id,l]of arbors) l.visible=false; }
+    }
+    document.getElementById('bAdd').onclick=()=>{const nm=document.getElementById('bNew').value.trim();if(!nm)return;if(!groups[nm])groups[nm]={ids:[],note:'',ts:Date.now()};activeG=nm;document.getElementById('bNew').value='';saveG();renderBatch();renderList();};
+    document.getElementById('bSel').onchange=e=>{activeG=e.target.value;isolate=false;renderBatch();renderList();updateHud();};
+    function addToBatch(id){
+        if(!id)return;
+        if(!activeG){let i=1;while(groups['batch '+i])i++;const nm='batch '+i;groups[nm]={ids:[],note:'',ts:Date.now()};activeG=nm;}
+        const G=groups[activeG];if(!G.ids.includes(id)){G.ids.push(id);G.ts=Date.now();}
+        saveG();renderBatch();renderList();if(selId)renderQC(selId);
+    }
+    document.getElementById('bAddSel').onclick=()=>addToBatch(selId);
+    document.getElementById('qBatch').onclick=()=>addToBatch(selId);
+    document.getElementById('bIsolate').onchange=e=>{isolate=e.target.checked;applyIsolate();renderList();updateHud();};
+    document.getElementById('bNote').oninput=e=>{if(activeG){groups[activeG].note=e.target.value;saveG();}};
+    document.getElementById('bDel').onclick=()=>{if(activeG&&confirm('Delete batch "'+activeG+'"?')){delete groups[activeG];activeG='';isolate=false;saveG();renderBatch();renderList();updateHud();}};
+    document.querySelectorAll('#bacts .bbtns button[data-s]').forEach(b=>b.onclick=()=>{if(!activeG)return;for(const id of groups[activeG].ids){const q=qc[id]||{};q.status=b.dataset.s;q.ts=Date.now();qc[id]=q;}save();renderList();if(selId)renderQC(selId);});
+    document.getElementById('bExport').onclick=()=>{if(!activeG)return;const rows=[['id','area','set','status','notes','batch','batch_note','src']];for(const id of groups[activeG].ids){const q=qc[id]||{};rows.push([id,NE[id].area,NE[id].set,q.status||'',(q.notes||'').replace(/[\n,]/g,' '),activeG,(groups[activeG].note||'').replace(/[\n,]/g,' '),NE[id].src]);}const a=document.createElement('a');a.href=URL.createObjectURL(new Blob([rows.map(r=>r.map(x=>`"${x}"`).join(',')).join('\n')],{type:'text/csv'}));a.download='batch_'+activeG.replace(/\W+/g,'_')+'.csv';a.click();};
+    document.getElementById('bDownload').onclick=async()=>{if(!activeG)return;const ids=groups[activeG].ids;if(!ids.length)return;if(ids.length>30&&!confirm('Download '+ids.length+' SWC files? (browser may prompt)'))return;for(const id of ids){const a=document.createElement('a');a.href=NE[id].src;a.download=id+'.swc';document.body.appendChild(a);a.click();a.remove();await new Promise(r=>setTimeout(r,300));}};
+
+    let brain, sceneBox;
+    function fit(){ const c=sceneBox.getCenter(new THREE.Vector3()); const r=sceneBox.getSize(new THREE.Vector3()).length()/2; const dist=r/Math.sin(camera.fov*Math.PI/360)*1.2; const dir=new THREE.Vector3(0.12,0.16,-1).normalize(); controls.target.copy(c); camera.position.copy(c).addScaledVector(dir,dist); controls.update(); }
+    document.getElementById('fitBtn').onclick=fit;
+    document.getElementById('tBrain').onchange=e=>brain.visible=e.target.checked;
+
+    async function boot(){
+        META=await (await fetch(DATA+'neurons.json')).json();
+        NE=META.neurons; AREAS=META.areas; order=Object.keys(NE);
+        const b=await loadBin(DATA+'brain.bin');
+        brain=new THREE.Mesh(meshGeom(b.P,b.E),new THREE.MeshStandardMaterial({color:0xaebccb,transparent:true,opacity:0.08,roughness:1,metalness:0,side:THREE.BackSide,depthWrite:false}));
+        root.add(brain);
+        buildSomas(); buildLegend(); renderList(); updateHud(); renderBatch();
+        sceneBox=new THREE.Box3();
+        for(const id of order){const s=NE[id].soma;sceneBox.expandByPoint(new THREE.Vector3(s[0],s[1],s[2]));}
+        const sz=sceneBox.getSize(new THREE.Vector3()).length();
+        selMarker=new THREE.Mesh(new THREE.SphereGeometry(Math.max(sz*0.0038,0.02),16,16),new THREE.MeshBasicMaterial({color:0xffffff}));
+        selMarker.visible=false; root.add(selMarker);
+        fit();
+        document.getElementById('loading').style.opacity=0;
+    }
+    function resize(){const r=canvas.parentElement.getBoundingClientRect();const w=Math.max(1,Math.round(r.width)),h=Math.max(1,Math.round(r.height));if(canvas.width!==w||canvas.height!==h){renderer.setSize(w,h,false);camera.aspect=w/h;camera.updateProjectionMatrix();}}
+    (function loop(){resize();controls.update();renderer.render(scene,camera);requestAnimationFrame(loop);})();
+    boot();
+</script>
+</body>
+</html>
