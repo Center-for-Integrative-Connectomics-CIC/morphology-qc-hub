@@ -57,6 +57,14 @@
         .bacts textarea{width:100%;min-height:42px;font-family:var(--sans);font-size:12px;padding:7px;border:1px solid var(--line);border-radius:6px;resize:vertical}
 
         .grouplist{flex:1;overflow-y:auto;min-height:0}
+        .tabs{display:flex;border-bottom:1px solid var(--line);flex:none}
+        .tabs button{flex:1;font-family:var(--mono);font-size:11px;padding:8px 0;background:transparent;
+            border:none;border-bottom:2px solid transparent;cursor:pointer;color:#8fb8b0}
+        .tabs button.active{color:var(--ink);border-bottom-color:var(--accent);font-weight:600}
+        .tabpane{display:none;flex:1;min-height:0;flex-direction:column}
+        .tabpane.active{display:flex}
+        .tabopts{display:flex;align-items:center;gap:7px;padding:7px 10px;border-bottom:1px solid var(--line);flex:none}
+        .tabopts select{flex:1;font-size:11px}
         .grp{border-bottom:1px solid var(--line)}
         .grp-head{display:flex;align-items:center;gap:9px;padding:9px 13px;cursor:pointer;user-select:none;background:#fff}
         .grp-head:hover{background:var(--accent-wash)}
@@ -81,20 +89,109 @@
 
         .stage{position:relative;min-width:0;background:radial-gradient(ellipse at 50% 34%,#1b2733 0%,#0c1116 100%)}
         #gl{position:absolute;top:0;left:0;width:100%;height:100%;display:block}
-        .legend{position:absolute;top:14px;left:14px;background:rgba(12,17,22,.72);backdrop-filter:blur(6px);border:1px solid rgba(255,255,255,.1);border-radius:9px;padding:11px 13px;color:#dfe6e2}
+        .legend{position:relative;background:rgba(12,17,22,.72);backdrop-filter:blur(6px);border:1px solid rgba(255,255,255,.1);border-radius:9px;padding:11px 13px;color:#dfe6e2}
         .legend h4{font-family:var(--mono);font-size:10px;letter-spacing:1px;text-transform:uppercase;color:#8fb8b0;margin-bottom:8px;font-weight:500}
         .legend .item{display:flex;align-items:center;gap:8px;font-size:12px;margin:4px 0;cursor:pointer}
         .legend .item.off{opacity:.4}
+        .legend .subbtns{display:flex;gap:5px;margin:0 0 6px}
+        .legend .subbtns button{flex:1;background:#1b2429;color:#cdd8d3;border:1px solid rgba(255,255,255,.14);
+            border-radius:5px;font-family:var(--mono);font-size:10px;padding:3px 0;cursor:pointer}
+        .legend .subbtns button:hover{background:var(--accent);color:#f2fbf8;border-color:var(--accent)}
+        .legend .subgrp{display:flex;align-items:center;gap:7px;margin:6px 0 2px;cursor:pointer;
+            font-size:11.5px;padding:3px 5px;border-radius:5px;border:1px solid rgba(255,255,255,.08)}
+        .legend .subgrp:hover{background:rgba(255,255,255,.07)}
+        .legend .subgrp .c{margin-left:auto;font-family:var(--mono);font-size:10px;color:#8fb8b0}
+        .legend .subgrp.off{opacity:.42}
+        .legend .subchips{display:flex;flex-wrap:wrap;gap:4px;margin:0 0 6px}
+        .legend .chip{display:flex;align-items:center;gap:4px;font-family:var(--mono);font-size:9.5px;
+            border:1px solid;border-radius:5px;padding:2px 5px;cursor:pointer;color:#cdd8d3}
+        .legend .chip i{width:7px;height:7px;border-radius:2px;display:inline-block}
+        .legend .chip b{color:#8fb8b0;font-weight:500}
+        .legend .chip.off{opacity:.38}
+        .legend .item.selrow{background:rgba(122,92,240,.22);border-radius:5px}
+        .legend .arb{margin-left:auto;font-family:var(--mono);font-size:10px;color:#8fb8b0;
+            border:1px solid rgba(255,255,255,.14);border-radius:4px;padding:1px 5px;cursor:pointer}
+        .legend .arb:hover{background:var(--accent);color:#f2fbf8;border-color:var(--accent)}
+        .legend .arb.on{background:var(--accent);color:#f2fbf8;border-color:var(--accent);font-weight:600}
+        .legend .hgrp{display:flex;align-items:center;gap:7px;margin:7px 0 2px;font-family:var(--mono);
+            font-size:10px;letter-spacing:1px;color:#8fb8b0;cursor:pointer;user-select:none;
+            padding:3px 5px;border-radius:5px;border:1px solid rgba(255,255,255,.07)}
+        .legend .hgrp:hover{background:rgba(255,255,255,.07);color:#cfe9e2}
+        .legend .hgrp .eye{font-size:10px;color:var(--accent);margin-left:7px}
+        .legend .hgrp .garb{margin-left:auto}
+        .legend .hgrp.off{opacity:.45}
+        .legend .hgrp.off .eye{color:#8fb8b0}
         .legend .sw{width:12px;height:12px;border-radius:3px;border:1px solid rgba(255,255,255,.15)}
         .legend .item .c{margin-left:auto;font-family:var(--mono);font-size:10.5px;color:#8fb8b0}
-        .toggles{position:absolute;top:186px;left:14px;display:flex;flex-direction:column;gap:7px;align-items:flex-start;z-index:4}
+        .legend .ab{font-size:11px;line-height:1;padding:2px 5px;border-radius:4px;cursor:pointer;
+            border:1px solid rgba(255,255,255,.14);color:#8fb8b0;margin-left:6px}
+        .legend .ab:hover{background:var(--accent);color:#f2fbf8;border-color:var(--accent)}
+        .legend .ab.on{background:var(--accent);color:#f2fbf8;border-color:var(--accent);font-weight:600}
+        .legend .ab.dis{opacity:.28;cursor:not-allowed}
+        .legend .ab.dis:hover{background:none;color:#8fb8b0;border-color:rgba(255,255,255,.14)}
+        .sub-head{display:flex;align-items:center;gap:8px;padding:8px 11px;cursor:pointer;
+            border-bottom:1px solid var(--line);font-size:12px}
+        .sub-head:hover{background:rgba(255,255,255,.04)}
+        .sub-head .nm{font-family:var(--mono);font-size:11.5px}
+        .sub-head .cnt{margin-left:auto;font-family:var(--mono);font-size:10.5px;color:#8fb8b0}
+        .grp.open .sub-head .chev{transform:rotate(90deg)}
+        .subbar{display:flex;align-items:center;gap:6px;padding:5px 10px 5px 26px;font-family:var(--mono);
+            font-size:9.5px;letter-spacing:.5px;text-transform:uppercase;color:#8fb8b0;background:rgba(255,255,255,.03)}
+        .subbar button{margin-left:0;background:#1b2429;color:#cdd8d3;border:1px solid rgba(255,255,255,.14);
+            border-radius:4px;font-family:var(--mono);font-size:9px;padding:2px 6px;cursor:pointer;text-transform:none}
+        .subbar button:hover{background:var(--accent);color:#f2fbf8;border-color:var(--accent)}
+        .subbar span{margin-right:auto}
+        .sgrp-head{display:flex;align-items:center;gap:7px;padding:6px 10px 6px 22px;cursor:pointer;font-size:11.5px}
+        .sgrp-head:hover{background:rgba(255,255,255,.05)}
+        .sgrp-head .nm{font-family:var(--mono);font-size:11px}
+        .sgrp-head .cnt{font-family:var(--mono);font-size:10px;color:#8fb8b0;min-width:30px;text-align:right}
+        .sgvis{margin-left:auto;margin-right:6px;font-family:var(--mono);font-size:10px;color:#8fb8b0;
+            border:1px solid rgba(255,255,255,.14);border-radius:4px;padding:1px 5px;cursor:pointer}
+        .sgvis:hover{background:var(--accent);color:#f2fbf8;border-color:var(--accent)}
+        .sgvis.on{background:var(--accent);color:#f2fbf8;border-color:var(--accent);font-weight:600}
+        .sgrp .grp-body{display:none}
+        .sgrp.open .grp-body{display:block}
+        .sgrp.open .sgrp-head .chev{transform:rotate(90deg)}
+        .sgrp .nrow{padding-left:34px}
+        .grp-more.more-btn{cursor:pointer}
+        .grp-more.more-btn:hover{color:var(--accent);text-decoration:underline}
+        #selchip{position:absolute;left:50%;transform:translateX(-50%);top:14px;display:none;
+            align-items:center;gap:8px;background:rgba(12,17,22,.88);backdrop-filter:blur(6px);
+            border:1px solid rgba(255,255,255,.14);border-radius:9px;padding:6px 10px;z-index:6}
+        #selchip.on{display:flex}
+        #selchip #selName{font-family:var(--mono);font-size:11.5px;color:#dfe6e2}
+        #selchip .sw{width:10px;height:10px;border-radius:3px}
+        #selchip #selPos{font-family:var(--mono);font-size:11px;color:#8fb8b0;
+            padding-left:2px;border-left:1px solid rgba(255,255,255,.12);margin-left:2px}
+        #selchip button{background:#1b2429;color:#cdd8d3;border:1px solid rgba(255,255,255,.14);
+            border-radius:6px;padding:2px 8px;font-size:12px;cursor:pointer;line-height:1.3}
+        #selchip button:hover{background:var(--accent);color:#f2fbf8;border-color:var(--accent)}
+        #selchip button.on{background:var(--accent);color:#f2fbf8;border-color:var(--accent);font-weight:600}
+        #trav{position:absolute;left:50%;transform:translateX(-50%);bottom:52px;display:none;
+            align-items:center;gap:9px;background:rgba(12,17,22,.86);backdrop-filter:blur(6px);
+            border:1px solid rgba(255,255,255,.12);border-radius:9px;padding:7px 11px;z-index:6}
+        #trav.on{display:flex}
+        #trav button{background:#1b2429;color:#dfe6e2;border:1px solid rgba(255,255,255,.14);
+            border-radius:6px;padding:3px 9px;font-size:12px;cursor:pointer;line-height:1.3}
+        #trav button:hover{background:var(--accent);color:#f2fbf8;border-color:var(--accent)}
+        #trav .tl{font-family:var(--mono);font-size:10px;letter-spacing:1px;text-transform:uppercase;color:#8fb8b0}
+        #trav .tc{font-family:var(--mono);font-size:11.5px;color:#dfe6e2;min-width:62px;text-align:center}
+        #trav .tn{font-family:var(--mono);font-size:11px;color:#8fb8b0;max-width:190px;overflow:hidden;
+            text-overflow:ellipsis;white-space:nowrap}
+        .legend .item.arow{cursor:default}
+        .legend .item.arow.off .an,.legend .item.arow.off .sw{opacity:.4}
+        .toggles{display:flex;flex-direction:column;gap:7px;align-items:flex-start}
+        #leftcol{position:absolute;top:14px;left:14px;z-index:4;display:flex;flex-direction:column;gap:10px;max-height:calc(100% - 28px);overflow-y:auto;padding-right:4px;align-items:flex-start}
+        #leftcol .legend{max-height:none}
         .toggles label{display:flex;align-items:center;gap:7px;font-family:var(--mono);font-size:11px;color:#cdd8d3;background:rgba(12,17,22,.66);padding:6px 10px;border-radius:7px;border:1px solid rgba(255,255,255,.08);cursor:pointer}
         .toggles input{accent-color:var(--accent)}
         .toggles .tdiv{font-family:var(--mono);font-size:9px;letter-spacing:1px;text-transform:uppercase;color:#7f938c;margin-top:5px;padding-left:2px}
         .toggles .csw{width:9px;height:9px;border-radius:2px;display:inline-block;flex:none}
-        #qcReopen{display:none;position:absolute;top:64px;right:14px;z-index:5;align-items:center;gap:7px;font-family:var(--mono);font-size:11px;color:#0c1116;background:var(--accent);padding:8px 12px;border-radius:8px;border:none;cursor:pointer;font-weight:600;box-shadow:0 6px 18px rgba(0,0,0,.35)}
+        #qcReopen{display:none;position:absolute;top:64px;right:14px;z-index:5;align-items:center;gap:7px;font-family:var(--mono);font-size:11px;color:#f2fbf8;background:var(--accent);padding:8px 12px;border-radius:8px;border:none;cursor:pointer;font-weight:600;box-shadow:0 6px 18px rgba(0,0,0,.35)}
         #qcReopen:hover{background:#18988a}
-        #fitBtn{display:flex;align-items:center;gap:7px;font-family:var(--mono);font-size:11px;color:#0c1116;background:var(--accent);padding:7px 11px;border-radius:7px;border:none;cursor:pointer;font-weight:600}
+        #clearBtn{display:flex;align-items:center;gap:7px;font-family:var(--mono);font-size:11px;color:#f2fbf8;background:#2a3a44;padding:7px 11px;border-radius:7px;border:1px solid rgba(255,255,255,.14);cursor:pointer;font-weight:600}
+        #clearBtn:hover{background:#364a56}
+        #fitBtn{display:flex;align-items:center;gap:7px;font-family:var(--mono);font-size:11px;color:#f2fbf8;background:var(--accent);padding:7px 11px;border-radius:7px;border:none;cursor:pointer;font-weight:600}
         #fitBtn:hover{background:#18988a}
         .hud{position:absolute;bottom:12px;left:14px;font-family:var(--mono);font-size:11px;color:#9fb0aa;background:rgba(12,17,22,.6);padding:6px 10px;border-radius:7px}
         .hud b{color:#e6efe9}
@@ -142,6 +239,7 @@
         <div class="controls">
             <input class="search" id="search" placeholder="Filter by neuron ID / set…">
             <div class="rowline">
+                <select id="fMorph"><option value="">any type</option><option value="full_morph">full morph</option><option value="projections">projections</option><option value="sub_ref">SUB ref</option></select>
                 <select id="fStatus"><option value="">any QC</option><option value="unreviewed">unreviewed</option><option value="pass">pass</option><option value="flag">flag</option><option value="redo">redo</option></select>
                 <select id="fSort"><option value="id">sort: id</option><option value="len_um">length</option><option value="axon_um">axon</option><option value="n_nodes">nodes</option></select>
                 <span class="mini" id="listCount"></span>
@@ -165,20 +263,49 @@
 
     <div class="stage">
         <canvas id="gl"></canvas>
+        <div id="leftcol">
         <div class="legend" id="legend"><h4>areas · click to toggle</h4></div>
         <div class="toggles">
             <button id="fitBtn" title="Recentre &amp; fit the whole brain"><i class="fa-solid fa-expand"></i> fit view</button>
+            <button id="clearBtn" title="Remove every arbor from the 3D view"><i class="fa-solid fa-eraser"></i> clear arbors</button>
             <label><input type="checkbox" id="tBrain" checked> brain shell</label>
             <label><input type="checkbox" id="tSoma" checked> soma markers</label>
             <label><input type="checkbox" id="tArbors"> all arbors</label>
-            <div class="tdiv">compartments (sel.)</div>
-            <label><input type="checkbox" class="tComp" data-c="axon" checked> <i class="csw" style="background:#4aa3ff"></i> axon</label>
-            <label><input type="checkbox" class="tComp" data-c="basal" checked> <i class="csw" style="background:#ff5d5d"></i> basal dendrite</label>
-            <label><input type="checkbox" class="tComp" data-c="apical" checked> <i class="csw" style="background:#ffd23a"></i> apical dendrite</label>
+            <label title="Area hue with axon/dendrite shaded differently; off = pure compartment colours"><input type="checkbox" id="tArbComp" checked> area + compartment shading</label>
+            <label><input type="checkbox" id="tCcf"> CCF structures</label>
+            <label style="gap:6px">opacity <input type="range" id="meshOp" min="4" max="100" value="22" style="width:84px;accent-color:#7a5cf0"></label>
+            <div class="tdiv" title="Applies to the selected neuron and to every loaded group at once">compartments</div>
+            <label><input type="checkbox" class="cComp" data-c="axon" checked> <i class="csw" style="background:#4aa3ff"></i> axon</label>
+            <label><input type="checkbox" class="cComp" data-c="basal" checked> <i class="csw" style="background:#ff5d5d"></i> basal dendrite</label>
+            <label><input type="checkbox" class="cComp" data-c="apical" checked> <i class="csw" style="background:#ffd23a"></i> apical dendrite</label>
+            <label><input type="checkbox" class="cComp" data-c="soma" checked> <i class="csw" style="background:#efefef"></i> soma</label>
+        </div>
+        </div>
+        <div id="rightPanels" style="position:absolute;right:14px;bottom:14px;width:218px;z-index:4;display:flex;flex-direction:column;gap:9px;align-items:stretch">
+            <div class="legend mesh" id="meshInfo" style="position:static;display:none"></div>
+            <div class="legend mesh" id="ccfLegend" style="position:static;max-height:28vh;overflow-y:auto;display:none">
+                <h4>ccf structures · click to toggle</h4>
+            </div>
         </div>
         <button id="qcReopen" title="Show info panel"><i class="fa-solid fa-circle-info"></i> info panel</button>
         <div class="hud" id="hud"><b>0</b> neurons</div>
-        <div class="hint">drag rotate · scroll zoom · right-drag pan · click a soma</div>
+        <div class="hint">drag rotate · scroll zoom · right-drag pan · click a soma · ↑↓ step through the list</div>
+        <div id="selchip">
+            <span class="sw" id="selDot"></span>
+            <span id="selName"></span>
+            <span id="selPos" title="↑ / ↓ steps through this list"></span>
+            <button id="selFly" title="fly to this soma">⌖</button>
+            <button id="selInfo" title="open the info panel">ⓘ</button>
+            <button id="selClose" title="deselect (Esc)">✕</button>
+        </div>
+        <div id="trav">
+            <span class="tl" id="travLabel"></span>
+            <button id="travPrev" title="previous (←)">◀</button>
+            <span class="tc" id="travPos"></span>
+            <button id="travNext" title="next (→)">▶</button>
+            <span class="tn" id="travId"></span>
+            <button id="travClose" title="stop traversing">✕</button>
+        </div>
         <div class="loading" id="loading">loading atlas…</div>
 
         <div class="qc" id="qc">
@@ -190,6 +317,10 @@
             <div class="b">
                 <h5>Reconstruction</h5>
                 <div class="stats" id="qStats"></div>
+                <h5>Type &amp; source</h5>
+                <div class="comp" id="qType"></div>
+                <h5>Atlas location (soma)</h5>
+                <div class="comp" id="qLoc"></div>
                 <h5>Compartments (SWC types)</h5>
                 <div class="comp" id="qComp"></div>
                 <h5>QC status</h5>
@@ -206,16 +337,72 @@
     </div>
 </div>
 
+<div id="jsErr" style="display:none;position:fixed;left:14px;right:14px;top:14px;z-index:99;
+    background:#2a1417;border:1px solid #5b2730;border-radius:8px;padding:12px 14px;color:#ffc9cf;
+    font-family:ui-monospace,Menlo,monospace;font-size:12px;white-space:pre-wrap;max-height:40vh;overflow:auto"></div>
+<script>
+// Surface startup failures instead of leaving a blank stage.
+(function(){
+  function show(msg){
+    var b=document.getElementById('jsErr');
+    if(!b) return;
+    b.style.display='block';
+    b.textContent=(b.textContent?b.textContent+'\n\n':'')+msg;
+  }
+  // also beam the message at the static server so it lands in its access log,
+  // which is readable from the terminal when the browser console is not
+  function beam(tag,msg){
+    try{ fetch('/__clienterror?'+tag+'='+encodeURIComponent(String(msg).slice(0,600))); }catch(_){}
+  }
+  addEventListener('error',function(e){
+    var m=(e.error&&e.error.stack ? e.error.stack : (e.message||e))+
+          (e.filename?('\n  at '+e.filename+':'+e.lineno+':'+e.colno):'');
+    show('ERROR: '+m); beam('err',m);
+  });
+  addEventListener('unhandledrejection',function(e){
+    var r=e.reason, m=(r&&r.stack?r.stack:r); show('UNHANDLED: '+m); beam('rej',m);
+  });
+  addEventListener('load',function(){
+    setTimeout(function(){
+      var l=document.getElementById('loading');
+      var stuck=l && getComputedStyle(l).opacity!=='0';
+      var cnt=(window.__diag&&window.__diag())||'no-diag';
+      beam('state','loadingVisible='+stuck+' '+cnt);
+    },6000);
+  });
+})();
+</script>
 <script type="module">
     import * as THREE from 'three';
     import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
 
-    const AC = { CA1:0xf2762e, CA2:0xe0403a, DG:0xf2b705, POST:0x2e9e57, PRE:0x2aa4e0, PARA:0xc840c8 };
-    const AHEX = { CA1:'#f2762e', CA2:'#e0403a', DG:'#f2b705', POST:'#2e9e57', PRE:'#2aa4e0', PARA:'#c840c8' };
+    // derived from neurons.json so a new area needs no edit here
+    const AC = {}, AHEX = {};
     const DATA='data/', SWC='data/swc/', QKEY='pdh_qc_v1';
     let META, NE, AREAS, order=[];
     const qc = JSON.parse(localStorage.getItem(QKEY)||'{}');
-    const areaOn = {CA1:1,CA2:1,DG:1,POST:1,PRE:1,PARA:1};
+    // The dataset merge re-keyed neurons from *_labeled / *_edited to bare ids.
+    // Saved QC lives in localStorage under the old keys, so migrate it once
+    // rather than silently orphaning the review work.
+    (async()=>{
+        if(localStorage.getItem(QKEY+'_mig')) return;
+        try{
+            const map=await (await fetch(DATA+'id_migration.json')).json();
+            let n=0;
+            for(const [oldId,newId] of Object.entries(map)){
+                if(qc[oldId]!==undefined && qc[newId]===undefined){ qc[newId]=qc[oldId]; delete qc[oldId]; n++; }
+            }
+            if(n){ localStorage.setItem(QKEY,JSON.stringify(qc)); }
+            const gk=JSON.parse(localStorage.getItem('pdh_groups_v1')||'{}');
+            let gn=0;
+            for(const g in gk){ if(Array.isArray(gk[g])){
+                gk[g]=gk[g].map(i=>map[i]||i); gn++; } }
+            if(gn) localStorage.setItem('pdh_groups_v1',JSON.stringify(gk));
+            localStorage.setItem(QKEY+'_mig','1');
+            if(n) console.log(`migrated ${n} QC records to the new neuron ids`);
+        }catch(e){ console.warn('id migration skipped',e); }
+    })();
+    const areaOn = {};
     const openGrp = {};
     let selId=null;
 
@@ -240,24 +427,304 @@
     const NUM_NAME={1:'soma',2:'axon',3:'dendrite',4:'apical',10:'c10',11:'c11',12:'c12',0:'undef'};
     const NUM_COL={}; for(const k in NUM_NAME) NUM_COL[k]=new THREE.Color(TYPE_HEX[NUM_NAME[k]]);
     const lineGeom=(P,E)=>{const g=new THREE.BufferGeometry();g.setAttribute('position',new THREE.BufferAttribute(P,3));g.setIndex(new THREE.BufferAttribute(E,1));return g;};
+    // Allen CCFv3 surfaces, baked by build_ccf_meshes.py into this viewer's
+    // display frame (build_hub.to_display), so they sit in the same space as
+    // the neurons with no transform applied here.
+    const ccf={meta:null,parts:[],group:null,on:false,op:0.22};
+    async function loadCcf(){
+        let meta;
+        try{ meta=await (await fetch(DATA+'ccf_regions.json')).json(); }
+        catch(e){ console.warn('CCF regions unavailable',e); return; }
+        const buf=await (await fetch(DATA+'ccf_regions.bin')).arrayBuffer();
+        ccf.meta=meta; ccf.group=new THREE.Group(); ccf.group.visible=false; root.add(ccf.group);
+        for(const r of meta.regions){
+            const g=new THREE.BufferGeometry();
+            g.setAttribute('position',new THREE.BufferAttribute(new Float32Array(buf,r.posOff,r.nv*3),3));
+            g.setAttribute('normal',new THREE.BufferAttribute(new Float32Array(buf,r.normOff,r.nv*3),3));
+            g.setIndex(new THREE.BufferAttribute(new Uint32Array(buf,r.idxOff,r.nt*3),1));
+            // Needed for correct frustum culling: without it three.js derives the
+            // sphere lazily, and a stale one makes a region vanish at some angles.
+            g.computeBoundingSphere();
+            const mat=new THREE.MeshStandardMaterial({color:new THREE.Color(r.color),
+                transparent:true,opacity:ccf.op,roughness:.95,metalness:0,
+                side:THREE.DoubleSide,depthWrite:false,depthTest:true});
+            const mesh=new THREE.Mesh(g,mat); mesh.name=r.name; mesh.userData.r=r;
+            mesh.visible=false;                     // applyOverlay() owns visibility
+            // These shells interpenetrate, so per-frame distance sorting flips
+            // their order as the camera orbits - that is the flashing.  A stable,
+            // distinct renderOrder (largest first) wins over distance sorting and
+            // fixes the draw sequence for good.  Culling is disabled too: ten
+            // meshes are negligible to draw, and it removes the other way a
+            // structure can blink out.
+            mesh.frustumCulled=false;
+            r.idx=ccf.parts.length;
+            ccf.group.add(mesh); ccf.parts.push({r,mesh,on:true});
+        }
+        ccf.parts.sort((a,b)=>b.r.mm3-a.r.mm3)
+                 .forEach((p,i)=>{ p.mesh.renderOrder = 20 + i; });
+        function buildPanel(elId, title){
+            const el=document.getElementById(elId);
+            if(!el) return;
+            const mine=ccf.parts;
+            const by={};
+            for(const p of mine){ (by[p.r.parent]=by[p.r.parent]||[]).push(p); }
+            el.innerHTML=`<h4>${title}</h4>`+
+                Object.keys(by).sort().map(k=>
+                    `<div class="hgrp" data-p="${k}" title="toggle the whole ${k} area">`+
+                    `<span>${k}</span><span class="c" style="margin-left:6px;opacity:.7">${by[k].length}</span>`+
+                    `<span class="arb garb" data-p="${k}" `+
+                    `title="show every arbor in the whole ${k} area">\u2197 ${groupNeurons(k).length}</span>`+
+                    `<span class="arb gtrv" data-p="${k}" `+
+                    `title="step through every neuron in the whole ${k} area">\u21c4</span>`+
+                    `<span class="eye">\u25c9</span></div>`+
+                    by[k].map(p=>`<div class="item hgi" data-i="${p.r.idx}">`+
+                        `<span class="sw" style="background:${p.r.color}"></span>${p.r.name}`+
+                        `<span class="arb" data-i="${p.r.idx}" title="show every arbor whose soma is in this region">`+
+                        `\u2197 ${regionNeurons(p.r).length}</span>`+
+                        `<span class="arb trvr" data-i="${p.r.idx}" title="step through each neuron in this region">`+
+                        `\u21c4</span></div>`).join('')
+                ).join('');
+            const syncHead=parent=>{
+                const h=el.querySelector(`.hgrp[data-p="${CSS.escape(parent)}"]`);
+                if(h) h.classList.toggle('off',
+                    !mine.some(q=>q.r.parent===parent&&q.on));
+            };
+            el.querySelectorAll('.trvr').forEach(b=>b.onclick=ev=>{
+                ev.stopPropagation();
+                const r=ccf.parts[+b.dataset.i].r;
+                startTraverse(r.name,regionNeurons(r));
+            });
+            el.querySelectorAll('.gtrv').forEach(b=>b.onclick=ev=>{
+                ev.stopPropagation();
+                startTraverse(b.dataset.p,groupNeurons(b.dataset.p));
+            });
+            el.querySelectorAll('.arb:not(.garb):not(.trvr):not(.gtrv)').forEach(b=>b.onclick=ev=>{
+                ev.stopPropagation();
+                toggleRegionArbors(ccf.parts[+b.dataset.i],b);
+            });
+            el.querySelectorAll('.garb').forEach(b=>b.onclick=ev=>{
+                ev.stopPropagation();
+                const ids=groupNeurons(b.dataset.p);
+                toggleArborSet('g:'+b.dataset.p,ids,b,ids.length);
+            });
+            el.querySelectorAll('.hgi').forEach(it=>{
+                it.onclick=ev=>{
+                    if(ev.altKey){ if(ccf.pick) ccf.pick(ccf.parts[+it.dataset.i]); return; }
+                    const p=ccf.parts[+it.dataset.i];
+                    p.on=!p.on; it.classList.toggle('off',!p.on);
+                    syncHead(p.r.parent);
+                    if(ccf.apply) ccf.apply();
+                    if(ccf.sync) ccf.sync();
+                };
+            });
+            el.querySelectorAll('.hgrp').forEach(h=>h.onclick=()=>{
+                // one click turns a whole area on or off, not just one subregion
+                const items=mine.filter(q=>q.r.parent===h.dataset.p);
+                const want=items.some(q=>!q.on);
+                items.forEach(q=>{
+                    q.on=want;
+                    const row=el.querySelector(`.hgi[data-i="${q.r.idx}"]`);
+                    if(row) row.classList.toggle('off',!want);
+                });
+                h.classList.toggle('off',!want);
+                if(ccf.apply) ccf.apply();
+                if(ccf.sync) syncAreaMeshButtons();
+            });
+        }
+        buildPanel('ccfLegend','ccf structures \u00b7 click to toggle');
+        console.log(`CCF: ${meta.regions.length} structures loaded`);
+    }
     const meshGeom=(P,E)=>{const g=new THREE.BufferGeometry();g.setAttribute('position',new THREE.BufferAttribute(P,3));g.setIndex(new THREE.BufferAttribute(E,1));g.computeVertexNormals();return g;};
 
+    // Saustad et al. classify the subicular neurons by anatomical column,
+    // projection class and layer.  SUB is shown under that scheme rather than
+    // one flat area colour, since the column/class split is the point of it.
+    // Saustad & Bienkowski 2026, Hippocampus 36:e70138.
+    // Colours follow the paper's own figures: columns from Fig. 1C/3B
+    // (SUBdd red, ProSUB orange, SUBv green, SUBvv blue, SUBdv purple) and
+    // layers from Fig. 1B/3A (SUB_1 red, SUB_2 blue, SUB_3 orange, SUB_4
+    // yellow).  Group counts were checked against Table 1 and match exactly.
+    const SUB_COL={ProSUB:'#f6921e',SUBdd:'#ec1c24',SUBdv:'#652d90',SUBv:'#00a551',SUBvv:'#00aeef'};
+    const SUB_LAY={'1':'#ec1c24','2':'#00aeef','3':'#f6921e','4':'#fff200'};
+    // Fig. 12: layer 2 is IT, layers 1 and 3 are ET, layer 4 is CT.  The
+    // dataset's own `cls` column instead calls SUB_1 "IT", so class is derived
+    // from the layer here to follow the paper.
+    const SUB_CLS_OF={'1':'ET','2':'IT','3':'ET','4':'CT'};
+    const SUB_CLS={IT:'#8a63f2',ET:'#4aa3ff',CT:'#ec1c24'};
+    // the 12 cell-type groups, ordered as in the paper
+    const SUB_CT_ORDER=['SUBdd_1','SUBdd_4','ProSUB_3','ProSUB_4','SUBv_2','SUBv_3',
+                        'SUBv_4','SUBvv_2','SUBvv_3','SUBvv_4','SUBdv_1','SUBdv_4'];
+    // Saustad et al. colour the 12 cell-type groups by their *layer* (Tables 2
+    // and 3; Fig. 4 traces), with the column carried by the grouping rather
+    // than the swatch.  The column palette (Fig. 1C/3B/7) is a separate scheme.
+    function subCTColor(name){
+        const lay=name.slice(name.lastIndexOf('_')+1);
+        return SUB_LAY[lay]||'#9aa7b4';
+    }
+    const SUB_SCHEMES={
+        celltype:{label:'cell type', order:SUB_CT_ORDER, col:{}},
+        column:{label:'column', order:['SUBdd','SUBdv','ProSUB','SUBv','SUBvv'], col:SUB_COL},
+        sub_layer:{label:'layer', order:['1','2','3','4'], col:SUB_LAY},
+        cls:{label:'class (IT/ET/CT)', order:['IT','ET','CT'], col:SUB_CLS}
+    };
+    for(const n of SUB_CT_ORDER) SUB_SCHEMES.celltype.col[n]=subCTColor(n);
+    let subScheme='celltype';
+    const subOff={};                         // scheme value -> hidden
+    function subVal(id){
+        const m=(NE[id]&&NE[id].meta)||{};
+        if(subScheme==='celltype')
+            return (m.column&&m.sub_layer)?`${m.column}_${m.sub_layer}`:'';
+        if(subScheme==='cls') return SUB_CLS_OF[m.sub_layer]||'';
+        return (m[subScheme]||'')+'';
+    }
+    function subHex(id){
+        const sc=SUB_SCHEMES[subScheme];
+        return (sc&&sc.col[subVal(id)])||AHEX.SUB||'#15b8a6';
+    }
+    function subTag(id){
+        const m=(NE[id]&&NE[id].meta)||{};
+        if(!m.column) return '';
+        return `${m.column}_${m.sub_layer} \u00b7 ${SUB_CLS_OF[m.sub_layer]||''} `;
+    }
+
+    // hub area -> CCF acronym (PARA is PAR in the Allen nomenclature)
+    const CCF_OF_AREA={CA1:'CA1',CA2:'CA2',CA3:'CA3',DG:'DG',SUB:'SUB',
+                       POST:'POST',PRE:'PRE',PARA:'PAR'};
     const somaObj={};
+    // Marker visibility only: soma_ccf.json records which CCF structure each
+    // soma lands in.  No SWC, QC record or neuron entry is touched - a hidden
+    // neuron is still selectable from the list and still exports.
+    let SOMA_CCF=null;
+    async function loadSomaCcf(){
+        try{ SOMA_CCF=(await (await fetch(DATA+'soma_ccf.json')).json()).soma; }
+        catch(e){ console.warn('soma_ccf.json unavailable',e); }
+    }
     function buildSomas(){
         for(const a of AREAS){
-            const ids=order.filter(id=>NE[id].area===a);
+            let ids=order.filter(id=>NE[id].area===a);
+            // CA1 markers are restricted to somas that actually fall inside CA1
+            // (38 of 951 do not).  Marker visibility only - the neurons stay in
+            // the list, stay selectable, and their SWC and QC records are
+            // untouched.  Other areas are left alone: the cell layer sits close
+            // enough to the CCF boundary that the same test would hide many of
+            // them for the wrong reason.
+            if(a==='CA1'&&SOMA_CCF)
+                ids=ids.filter(id=>SOMA_CCF[id]==='CA1');
             const pos=new Float32Array(ids.length*3);
             ids.forEach((id,i)=>{const s=NE[id].soma;pos[i*3]=s[0];pos[i*3+1]=s[1];pos[i*3+2]=s[2];});
             const g=new THREE.BufferGeometry(); g.setAttribute('position',new THREE.BufferAttribute(pos,3)); g.userData.ids=ids;
-            const pts=new THREE.Points(g,new THREE.PointsMaterial({color:AC[a],size:4.5,sizeAttenuation:false}));
+            let mat;
+            if(a==='SUB'){
+                const col=new Float32Array(ids.length*3);
+                ids.forEach((id,i)=>{const c=new THREE.Color(subHex(id));
+                    col[i*3]=c.r;col[i*3+1]=c.g;col[i*3+2]=c.b;});
+                g.setAttribute('color',new THREE.BufferAttribute(col,3));
+                mat=new THREE.PointsMaterial({vertexColors:true,size:4.5,sizeAttenuation:false});
+            } else mat=new THREE.PointsMaterial({color:AC[a],size:4.5,sizeAttenuation:false});
+            const pts=new THREE.Points(g,mat);
             pts.userData.area=a; root.add(pts); somaObj[a]=pts;
         }
     }
     const areaMat={}; for(const a in AC) areaMat[a]=new THREE.LineBasicMaterial({color:AC[a],transparent:true,opacity:0.82});
+    // loadArbor() already bakes per-node compartment colours into the geometry,
+    // but areaMat is a flat colour with no vertexColors, so they were discarded.
+    const compMat=new THREE.LineBasicMaterial({vertexColors:true,transparent:true,opacity:0.9});
+    let arborComp=true;
+    function arborMat(id){ return arborComp?compMat:areaMat[NE[id].area]; }
+    function applyArborMat(){
+        for(const[id,l]of arbors){
+            l.material=arborMat(id);
+            const u=l.geometry.userData;
+            if(u&&u.colComp&&u.colArea)
+                l.geometry.setAttribute('color',new THREE.BufferAttribute(
+                    arborComp?u.colArea:u.colComp,3));
+        }
+    }
+    // Keeps the area identifiable by hue while axon / dendrite / apical stay
+    // readable by shade: axon darkens the area colour, dendrites lighten it.
+    // Vary lightness in HSL so the area hue always survives.  The previous
+    // version mixed toward white, which washed apical-heavy arbors out to near
+    // white - CA3 alone has 73k apical nodes, so whole cells looked colourless.
+    const LIGHT={1:1.75,2:0.60,3:1.05,4:1.45,0:0.55,10:1.35,11:1.35,12:1.35};
+    const _hsl={h:0,s:0,l:0};
+    // SUB arbors take their hue from the active Saustad group so the whole
+    // reconstruction carries the paper's colour, not just its soma marker.
+    function arborBase(id){
+        const n=NE[id];
+        if(n&&n.area==='SUB') return new THREE.Color(subHex(id));
+        return new THREE.Color(AC[n?n.area:'']!==undefined?AC[n.area]:0x9aa7b4);
+    }
+    function areaShadeColors(nP,T,id){
+        const base=arborBase(id);
+        base.getHSL(_hsl);
+        const cache={}, out=new Float32Array(nP*3);
+        for(let i=0;i<nP;i++){
+            const t=T?T[i]:2;
+            let c=cache[t];
+            if(!c){
+                const k=LIGHT[t]!==undefined?LIGHT[t]:1.0;
+                c=cache[t]=new THREE.Color().setHSL(_hsl.h,
+                    Math.max(0.25,_hsl.s*(t===1?0.45:1)),
+                    Math.min(0.92,Math.max(0.10,_hsl.l*k)));
+            }
+            out[i*3]=c.r; out[i*3+1]=c.g; out[i*3+2]=c.b;
+        }
+        return out;
+    }
+
     const arbors=new Map();
 
-    const COMP_CLASS = t => t===2?'axon' : t===3?'basal' : t===4?'apical' : 'other';
-    const compVis = {axon:true, basal:true, apical:true, other:true};
+    // Every SWC type has to land in a class with a checkbox behind it, or
+    // closing the compartments leaves those nodes on screen with no way to
+    // clear them: soma, the custom markers (10-12) and unlabelled (0) nodes
+    // used to fall into an 'other' bucket that nothing controlled.
+    const COMP_KINDS=['axon','basal','apical','soma','marker','undef'];
+    const COMP_CLASS = t => t===2?'axon' : t===3?'basal' : t===4?'apical'
+        : t===1?'soma' : (t===10||t===11||t===12)?'marker' : 'undef';
+    const emptyBuckets = () => { const b={}; for(const k of COMP_KINDS) b[k]=[]; return b; };
+    const CLS_ID={}; COMP_KINDS.forEach((k,i)=>CLS_ID[k]=i);
+    // A marker (10-12) or unlabelled node is an annotation hanging off a real
+    // branch, usually one or two nodes long.  Classed on its own it survives
+    // when the branch it belongs to is switched off, which is what left those
+    // orange specks floating in the view.  Give each one the class of its
+    // nearest typed ancestor instead, so markers go with their axon or
+    // dendrite; only a marker with no typed ancestor at all stays its own.
+    function effClassArr(nP,E,nE,T){
+        const par=new Int32Array(nP).fill(-1);
+        for(let k=0;k<nE;k++) par[E[k*2+1]]=E[k*2];
+        const out=new Uint8Array(nP);
+        for(let i=0;i<nP;i++){
+            let c=COMP_CLASS(T?T[i]:2);
+            if(c==='marker'||c==='undef'){
+                let j=par[i],h=0;
+                while(j>=0&&h++<256){
+                    const cj=COMP_CLASS(T?T[j]:2);
+                    if(cj==='axon'||cj==='basal'||cj==='apical'){ c=cj; break; }
+                    if(cj==='soma') break;        // sits on the soma: leave it
+                    j=par[j];
+                }
+            }
+            out[i]=CLS_ID[c];
+        }
+        return out;
+    }
+    // marker and undef have no checkbox: they are data problems to settle in
+    // the SWCs, not view options.  See COMP_DEFAULT for what each one does.
+    //
+    //   marker  SWC types 10-12.  Annotations, 1-2 nodes, hung off a branch;
+    //           ~0.4% of CA1 edges but 5-20 per neuron over 3,693 neurons, so
+    //           in bulk they read as orange specks scattered through the view
+    //           with a dense clump at the terminals.  effClassArr() gives 89%
+    //           of them the class of their nearest typed ancestor, so those go
+    //           with their axon or dendrite.  The ~11% that hang off nothing
+    //           typed are hidden by default - that residue is being cleaned up
+    //           in the source files during QC.
+    //   undef   SWC type 0.  Not noise: whole unlabelled trees, 61.9% of SUB
+    //           nodes (CA2 4.0%, PRE 0.5%, the rest ~0%), with no typed
+    //           ancestor to inherit from.  Shown, or SUB loses most of itself.
+    const COMP_DEFAULT={axon:true,basal:true,apical:true,soma:true,
+                        marker:false,undef:true};
+    const compVis = {...COMP_DEFAULT};
     const selComp = new THREE.Group(); root.add(selComp);
     function clearSelComp(){ while(selComp.children.length){const c=selComp.children.pop();c.geometry.dispose();c.material.dispose();} }
     function applyCompVis(){ for(const ln of selComp.children) ln.visible=compVis[ln.userData.cls]; }
@@ -284,8 +751,9 @@
         const col=new Float32Array(b.nP*3);
         for(let i=0;i<b.nP;i++){const c=NUM_COL[DT[i]]||NUM_COL[0]; col[i*3]=c.r;col[i*3+1]=c.g;col[i*3+2]=c.b;}
         const colAttr=new THREE.BufferAttribute(col,3);
-        const buckets={axon:[],basal:[],apical:[],other:[]};
-        for(let k=0;k<b.nE;k++){const a=b.E[k*2],c=b.E[k*2+1]; buckets[COMP_CLASS(DT[c])].push(a,c);}
+        const buckets=emptyBuckets();
+        const cls=effClassArr(b.nP,b.E,b.nE,DT);
+        for(let k=0;k<b.nE;k++){const a=b.E[k*2],c=b.E[k*2+1]; buckets[COMP_KINDS[cls[c]]].push(a,c);}
         for(const cls in buckets){
             if(!buckets[cls].length) continue;
             const g=new THREE.BufferGeometry(); g.setAttribute('position',pos); g.setAttribute('color',colAttr); g.setIndex(buckets[cls]);
@@ -293,25 +761,309 @@
             ln.userData.cls=cls; ln.visible=compVis[cls]; selComp.add(ln);
         }
     }
-    document.querySelectorAll('.tComp').forEach(cb=>cb.onchange=()=>{compVis[cb.dataset.c]=cb.checked;applyCompVis();});
+    // One compartment control for both targets: the selected neuron's split
+    // lines (compVis) and every merged group set (setComp).
+    function setCompartment(c,on){
+        compVis[c]=on; setComp[c]=on;
+        applyCompVis();
+        if(typeof applySetComp==='function') applySetComp();
+    }
+    document.querySelectorAll('.cComp').forEach(cb=>cb.onchange=()=>setCompartment(cb.dataset.c,cb.checked));
     async function loadArbor(id){
         if(arbors.has(id))return arbors.get(id);
         const b=await loadBin(SWC+id+'.bin'); const g=lineGeom(b.P,b.E);
-        if(b.T){ const col=new Float32Array(b.nP*3); for(let i=0;i<b.nP;i++){const c=NUM_COL[b.T[i]]||NUM_COL[0]; col[i*3]=c.r;col[i*3+1]=c.g;col[i*3+2]=c.b;} g.setAttribute('color',new THREE.BufferAttribute(col,3)); }
-        const line=new THREE.LineSegments(g,areaMat[NE[id].area]); line.userData.area=NE[id].area;
+        {   const col=new Float32Array(b.nP*3);
+            for(let i=0;i<b.nP;i++){const c=NUM_COL[b.T?b.T[i]:2]||NUM_COL[0]; col[i*3]=c.r;col[i*3+1]=c.g;col[i*3+2]=c.b;}
+            const colA=areaShadeColors(b.nP,b.T,id);
+            g.userData.colComp=col; g.userData.colArea=colA; g.userData.types=b.T?new Uint8Array(b.T):null;
+            g.setAttribute('color',new THREE.BufferAttribute(arborComp?colA:col,3)); }
+        const line=new THREE.LineSegments(g,arborMat(id)); line.userData.area=NE[id].area;
         line.visible=false; root.add(line); arbors.set(id,line); return line;
     }
     let selMarker;
 
+    function deselect(){
+        if(!selId) return;
+        if(arbors.has(selId)) arbors.get(selId).visible=false;
+        selId=null; flyFrom=null;
+        const fb=document.getElementById('selFly');
+        if(fb){ fb.classList.remove('on'); fb.title='fly to this soma'; }
+        selMarker.visible=false;
+        clearSelComp();
+        document.getElementById('qc').classList.remove('on');
+        document.getElementById('qcReopen').style.display='none';
+        document.getElementById('selchip').classList.remove('on');
+        syncInfoBtn();
+        renderList(); updateHud();
+    }
+    function showSelChip(id){
+        const el=document.getElementById('selchip');
+        if(!el) return;
+        if(!id){ el.classList.remove('on'); return; }
+        const a=NE[id].area;
+        document.getElementById('selDot').style.background=(a==='SUB'?subHex(id):AHEX[a])||'#9aa7b4';
+        document.getElementById('selName').textContent=id+(a?'  \u00b7  '+a:'');
+        el.classList.add('on');
+        navPos();
+        syncInfoBtn();
+    }
     async function select(id){
-        const bulk=document.getElementById('tArbors').checked;
-        if(selId && arbors.has(selId)) arbors.get(selId).visible=bulk;
+        // selComp draws the selection split by compartment, so the unsplit
+        // per-neuron line must stay hidden - it ignores the toggles.
+        if(selId && arbors.has(selId)) arbors.get(selId).visible=false;
         selId=id; const n=NE[id];
         selMarker.position.set(n.soma[0],n.soma[1],n.soma[2]); selMarker.visible=true;
         const line=await loadArbor(id); line.visible=false;
         await buildSelComp(id);
+        if(selId!==id){ flyFrom=null; }
+        showSelChip(id);
         renderQC(id); renderList(); updateHud();
     }
+
+    // Clicking a surface highlights it and shows its ROI, the way clicking a
+    // soma selects a neuron.  Clicking the same one again, or empty space,
+    // clears it - so the readout toggles rather than sticking.
+    let selMesh=null;
+    function applyMeshSelection(){
+        for(const q of ccf.parts){
+            const sel = selMesh===q;
+            q.mesh.material.opacity = selMesh ? (sel ? Math.min(1,Math.max(ccf.op,0.85)) : ccf.op*0.25)
+                                              : ccf.op;
+            q.mesh.material.emissive = new THREE.Color(sel?0x222222:0x000000);
+        }
+        const el=document.getElementById('meshInfo');
+        if(!el) return;
+        if(!selMesh){ el.style.display='none'; el.innerHTML=''; return; }
+        const r=selMesh.r;
+        const dot=c=>`<span class="sw" style="background:${c}"></span>`;
+        el.style.display='block';
+        el.innerHTML='<h4>ccf structure</h4>'+
+            `<div class="item">${dot(r.color)}<b>${r.name}</b></div>`+
+            `<div class="item" style="cursor:default">volume<span class="c">${r.mm3.toFixed(3)} mm\u00b3</span></div>`+
+            `<div class="item" style="cursor:default">triangles<span class="c">${r.nt.toLocaleString()}</span></div>`;
+        // mirror the highlight onto the legend row
+        document.querySelectorAll('.hgi').forEach(n=>
+            n.classList.toggle('selrow', +n.dataset.i===r.idx));
+    }
+    function pickMesh(sel){
+        selMesh = (selMesh===sel) ? null : sel;      // click again to clear
+        applyMeshSelection();
+    }
+    ccf.pick=pickMesh;
+
+    // Every neuron whose soma sits in a given surface, so a whole structure's
+    // arbors can be shown at once rather than one neuron at a time.
+    function regionNeurons(r){
+        if(!SOMA_CCF) return [];
+        return order.filter(id=>SOMA_CCF[id]===r.name);
+    }
+    // One merged geometry per region instead of one LineSegments per neuron:
+    // CA1d alone has 467 neurons, so the per-neuron version meant 467 draw calls
+    // and 467 objects.  Merged, a whole region is a single draw call.  Fetches
+    // run through a small pool rather than strictly one after another.
+    const regionArbors=new Map();                   // key -> merged THREE.Group
+    const setComp={...COMP_DEFAULT};
+    // A merged set also has to disappear when its area is switched off in the
+    // legend - otherwise the arbors stay on screen with their somas gone.
+    function applySetComp(){
+        for(const[,g]of regionArbors){
+            if(!g) continue;
+            const live = !g.userData.area || areaOn[g.userData.area];
+            g.children.forEach(c=>c.visible = live && !!setComp[c.userData.cls]);
+        }
+    }
+
+    async function fetchPool(urls, limit, onStep){
+        const out=new Array(urls.length); let next=0, done=0;
+        await Promise.all(Array.from({length:Math.min(limit,urls.length)},async()=>{
+            for(;;){
+                const i=next++; if(i>=urls.length) return;
+                try{ out[i]=await loadBin(urls[i]); }catch(e){ out[i]=null; }
+                if(onStep&&++done%25===0) onStep(done,urls.length);
+            }
+        }));
+        return out;
+    }
+
+    function groupNeurons(parent){
+        const out=new Set();
+        for(const q of ccf.parts)
+            if(q.r.parent===parent)
+                for(const id of regionNeurons(q.r)) out.add(id);
+        return [...out];
+    }
+    // Keys still fetching.  Without this a second click during a load fell
+    // through the `if(existing)` test (the slot holds null, which is falsy),
+    // started a second build, and left the first group orphaned in the scene
+    // with nothing referencing it - the fragments that would not go away.
+    const arborPending=new Set();
+
+    function disposeObj(o){
+        o.traverse(x=>{
+            if(x.geometry) x.geometry.dispose();
+            if(x.material) (Array.isArray(x.material)?x.material:[x.material]).forEach(m=>m.dispose());
+        });
+    }
+    function removeArborSet(key){
+        const g=regionArbors.get(key);
+        if(g){ root.remove(g); disposeObj(g); }
+        regionArbors.delete(key);
+        arborPending.delete(key);
+    }
+    function labelArborBtn(btn,on,label){
+        if(!btn) return;
+        btn.classList.toggle('on',on);
+        if(btn.classList.contains('ab')) btn.textContent=on?'\u25a0':'\u2197';
+        else if(btn.classList.contains('sgvis')) btn.textContent=on?'\u25a0':'\u2197';
+        else btn.textContent=(on?'\u25a0 ':'\u2197 ')+label;
+    }
+    function clearAllArbors(){
+        for(const key of [...regionArbors.keys()]) removeArborSet(key);
+        arborPending.clear();
+        for(const [,l] of arbors) l.visible=false;
+        const t=document.getElementById('tArbors'); if(t) t.checked=false;
+        document.querySelectorAll('.arb,.ab.swc,.sgvis,[data-sg-vis]').forEach(b=>{
+            b.classList.remove('on');
+            if(b.classList.contains('ab')||b.classList.contains('sgvis')) b.textContent='\u2197';
+        });
+    }
+
+    async function toggleArborSet(key,ids,btn,label){
+        if(regionArbors.has(key)||arborPending.has(key)){   // loaded, or mid-load
+            removeArborSet(key);
+            labelArborBtn(btn,false,label);
+            return;
+        }
+        if(!ids.length) return;
+        if(btn){ btn.textContent='0/'+ids.length; btn.classList.add('on'); }
+        arborPending.add(key);
+        const bins=await fetchPool(ids.map(id=>SWC+id+'.bin'),8,
+            (d,t)=>{ if(btn&&arborPending.has(key)) btn.textContent=d+'/'+t; });
+        if(!arborPending.has(key)){ labelArborBtn(btn,false,label); return; }  // cancelled
+
+        let nP=0,nE=0;
+        for(const b of bins){ if(b){ nP+=b.nP; nE+=b.nE; } }
+        const pos=new Float32Array(nP*3), col=new Float32Array(nP*3), idx=new Uint32Array(nE*2);
+        let po=0,eo=0,base=0;
+        bins.forEach((b,bi)=>{
+            if(!b) return;
+            pos.set(b.P,po*3);
+            const ar=arborComp?areaShadeColors(b.nP,b.T,ids[bi]):null;
+            for(let i=0;i<b.nP;i++){
+                if(ar){ col[(po+i)*3]=ar[i*3]; col[(po+i)*3+1]=ar[i*3+1]; col[(po+i)*3+2]=ar[i*3+2]; }
+                else { const c=NUM_COL[b.T?b.T[i]:2]||NUM_COL[0];
+                       col[(po+i)*3]=c.r; col[(po+i)*3+1]=c.g; col[(po+i)*3+2]=c.b; }
+            }
+            for(let k=0;k<b.nE*2;k++) idx[eo*2+k]=b.E[k]+base;
+            po+=b.nP; eo+=b.nE; base+=b.nP;
+        });
+        // One child per compartment, sharing the same position/colour buffers,
+        // so axon / basal / apical can be shown independently for a whole group
+        // without reloading or duplicating any geometry.
+        const clsOf=new Uint8Array(nP); { let o=0;
+            for(const b of bins){ if(!b) continue;
+                clsOf.set(effClassArr(b.nP,b.E,b.nE,b.T),o); o+=b.nP; } }
+        const buckets=emptyBuckets();
+        for(let e=0;e<idx.length;e+=2) buckets[COMP_KINDS[clsOf[idx[e+1]]]].push(idx[e],idx[e+1]);
+        const posAttr=new THREE.BufferAttribute(pos,3);
+        const colAttr=new THREE.BufferAttribute(col,3);
+        const grp=new THREE.Group();
+        { const as=new Set(ids.map(i=>NE[i].area));
+          grp.userData.area = as.size===1 ? [...as][0] : null; }
+        for(const cls in buckets){
+            if(!buckets[cls].length) continue;
+            const gg=new THREE.BufferGeometry();
+            gg.setAttribute('position',posAttr); gg.setAttribute('color',colAttr);
+            gg.setIndex(new THREE.BufferAttribute(new Uint32Array(buckets[cls]),1));
+            gg.computeBoundingSphere();
+            const ln=new THREE.LineSegments(gg,new THREE.LineBasicMaterial({
+                vertexColors:true,transparent:true,opacity:0.85}));
+            ln.frustumCulled=false; ln.renderOrder=1;
+            ln.userData.cls=cls; ln.visible=setComp[cls];
+            grp.add(ln);
+        }
+        arborPending.delete(key);
+        root.add(grp); regionArbors.set(key,grp);
+        applySetComp();          // one place decides what a merged set shows
+        labelArborBtn(btn,true,ids.length);
+    }
+    const toggleRegionArbors=(part,btn)=>
+        toggleArborSet('r:'+part.r.idx,regionNeurons(part.r),btn,regionNeurons(part.r).length);
+
+    // Step through the neurons of a chosen group one at a time, instead of
+    // hunting for each soma in the 3D view.  Arrow keys drive it too.
+    const trav={ids:[],i:0,label:''};
+    function startTraverse(label,ids){
+        if(!ids||!ids.length) return;
+        trav.ids=ids; trav.i=0; trav.label=label;
+        nav={ids:ids,label:label};
+        document.getElementById('trav').classList.add('on');
+        document.getElementById('travLabel').textContent=label;
+        travGo(0);
+    }
+    function travGo(d){
+        if(!trav.ids.length) return;
+        trav.i=(trav.i+d+trav.ids.length)%trav.ids.length;
+        const id=trav.ids[trav.i];
+        document.getElementById('travPos').textContent=`${trav.i+1} / ${trav.ids.length}`;
+        document.getElementById('travId').textContent=id.replace(/_labeled$|_edited$/,'');
+        select(id);
+    }
+    function travStop(){
+        trav.ids=[]; document.getElementById('trav').classList.remove('on');
+    }
+    // Choosing a cell from the list arms the up/down keys as a walk through
+    // that same list, so a subgroup can be reviewed neuron by neuron without
+    // going back to the sidebar for the next one.
+    let nav={ids:[],label:''};
+    function navArm(k){
+        if(!k){ nav={ids:[],label:''}; return; }
+        const [a,key]=k.split('|');
+        const g=subgroupsFor(a,filteredFor(a)).groups.find(x=>x.key===key);
+        nav = g ? {ids:g.ids,label:a+' \u00b7 '+g.name} : {ids:[],label:''};
+    }
+    function navFor(id){
+        // selected in the 3D view instead: walk its own subgroup
+        const a=NE[id].area, f=filteredFor(a);
+        const g=subgroupsFor(a,f).groups.find(x=>x.ids.includes(id));
+        return g ? {ids:g.ids,label:a+' \u00b7 '+g.name} : {ids:f,label:a};
+    }
+    function navPos(){
+        const el=document.getElementById('selPos');
+        if(!el) return;
+        const i=selId?nav.ids.indexOf(selId):-1;
+        el.textContent = i<0 ? '' : `${i+1} / ${nav.ids.length}`;
+        el.title = nav.label ? nav.label+'  \u2014  \u2191 / \u2193 to step' : '';
+    }
+    async function navGo(d){
+        if(!selId) return;
+        if(nav.ids.indexOf(selId)<0) nav=navFor(selId);
+        const i=nav.ids.indexOf(selId);
+        if(i<0||nav.ids.length<2) return;
+        await select(nav.ids[(i+d+nav.ids.length)%nav.ids.length]);
+        const row=document.querySelector('.nrow.on');
+        if(row) row.scrollIntoView({block:'nearest'});
+    }
+    addEventListener('keydown',e=>{
+        if(e.key!=='ArrowUp'&&e.key!=='ArrowDown') return;
+        const t=e.target.tagName;
+        if(t==='INPUT'||t==='TEXTAREA'||t==='SELECT') return;   // never steal typing
+        if(!selId) return;
+        e.preventDefault();
+        navGo(e.key==='ArrowDown'?1:-1);
+    });
+
+    document.getElementById('travPrev').onclick=()=>travGo(-1);
+    document.getElementById('travNext').onclick=()=>travGo(1);
+    document.getElementById('travClose').onclick=travStop;
+    addEventListener('keydown',e=>{
+        if(!trav.ids.length) return;
+        const t=e.target.tagName;
+        if(t==='INPUT'||t==='TEXTAREA') return;        // never steal typing
+        if(e.key==='ArrowLeft'){ e.preventDefault(); travGo(-1); }
+        else if(e.key==='ArrowRight'){ e.preventDefault(); travGo(1); }
+        else if(e.key==='Escape') travStop();
+    });
 
     const ray=new THREE.Raycaster(); ray.params.Points.threshold=0.05;
     const mouse=new THREE.Vector2(); let downXY=null;
@@ -325,15 +1077,56 @@
         for(const a of AREAS){ if(!areaOn[a]||!somaObj[a].visible)continue; const hit=ray.intersectObject(somaObj[a]);
             if(hit.length&&hit[0].distanceToRay<bd){bd=hit[0].distanceToRay;best=somaObj[a].geometry.userData.ids[hit[0].index];} }
         if(batchSomas&&batchSomas.visible){const hit=ray.intersectObject(batchSomas);if(hit.length&&hit[0].distanceToRay<bd){bd=hit[0].distanceToRay;best=batchSomas.geometry.userData.ids[hit[0].index];}}
-        if(best)select(best);
+        if(best){ select(best); return; }
+        // no soma under the cursor: try the atlas surfaces
+        const vis=ccf.parts.filter(q=>q.mesh.visible).map(q=>q.mesh);
+        const mh=vis.length?ray.intersectObjects(vis,false):[];
+        pickMesh(mh.length?ccf.parts.find(q=>q.mesh===mh[0].object):null);
     });
 
     function renderQC(id){
-        const n=NE[id]; document.getElementById('qc').classList.add('on'); document.getElementById('qcReopen').style.display='none';
+        // The panel never opens itself - it only follows whatever the user set,
+        // so a click on a soma selects without the panel springing open.
+        const n=NE[id]; const qcEl=document.getElementById('qc');
+        document.getElementById('qcReopen').style.display =
+            qcEl.classList.contains('on') ? 'none' : 'inline-flex';
         document.getElementById('qId').textContent=id;
         document.getElementById('qArea').innerHTML=`<span style="width:10px;height:10px;border-radius:50%;background:${AHEX[n.area]};display:inline-block"></span> ${n.area} · set ${n.set}`;
         const st=[['nodes',n.n_nodes.toLocaleString()],['length µm',Math.round(n.len_um).toLocaleString()],['axon µm',Math.round(n.axon_um).toLocaleString()],['branches',n.n_branches],['tips',n.n_tips],['roots',n.n_roots]];
         document.getElementById('qStats').innerHTML=st.map(s=>`<div><div class="v">${s[1]}</div><div class="k">${s[0]}</div></div>`).join('');
+        (function(){
+            const el=document.getElementById('qType');
+            if(!el) return;
+            const m=n.morph_type||'—', x=n.meta||{};
+            const chip=(k,v)=>v?`<span><b style="color:#dfe6e2">${k}</b> ${v}</span>`:'';
+            let h=chip('type',m==='full_morph'?'full morphology':m==='projections'?'projection (axon only)':m==='sub_ref'?'subicular reference':m);
+            if(n.set) h+=chip('set',n.set);
+            if(x.qc_flag) h+=chip('flag',x.qc_flag);
+            if(x.multi_fragment) h+=`<span style="color:#ffb86b">multi-fragment</span>`;
+            // Saustad SUB neurons carry the authors' own labels, not compartment QC
+            if(x.column){
+                h+=chip('cell type',`${x.column}_${x.sub_layer}`)
+                 + chip('column',x.column) + chip('layer','SUB_'+x.sub_layer)
+                 + chip('class',SUB_CLS_OF[x.sub_layer]||x.cls)
+                 + chip('ref','Saustad 2026 Table 1');
+            }
+            if(x.targets) h+=`<span style="flex-basis:100%"><b style="color:#dfe6e2">targets</b> ${x.targets.replace(/;/g,', ')}</span>`;
+            el.innerHTML=h||'<span style="color:#8a8f96">—</span>';
+        })();
+        // which CCF structure contains the soma - same source as the CA1
+        // marker filter, so the panel and the markers never disagree
+        (function(){
+            const el=document.getElementById('qLoc');
+            if(!el) return;
+            if(!SOMA_CCF){ el.innerHTML='<span style="color:#8a8f96">atlas lookup unavailable</span>'; return; }
+            const r=SOMA_CCF[id];
+            const dot=c=>`<i style="display:inline-block;width:8px;height:8px;border-radius:50%;background:${c};margin-right:5px;vertical-align:middle"></i>`;
+            if(!r){ el.innerHTML=`<span>${dot('#8a8f96')}outside the hippocampal formation</span>`; return; }
+            const cc=(ccf.meta?ccf.meta.regions:[]).find(x=>x.name===r);
+            const want=CCF_OF_AREA[n.area];
+            el.innerHTML=`<span>${dot(cc?cc.color:'#9aa7b4')}CCF: ${r}</span>`+
+                (want&&want!==r?`<span style="color:#ffb86b">⚠ labelled ${n.area}</span>`:'');
+        })();
         document.getElementById('qComp').innerHTML=Object.entries(n.types).map(([k,v])=>`<span><i style="display:inline-block;width:8px;height:8px;border-radius:50%;background:${TYPE_HEX[k]||'#8a8f96'};margin-right:5px;vertical-align:middle"></i>${k}: ${v.toLocaleString()}</span>`).join('');
         const q=qc[id]||{};
         document.querySelectorAll('#qStatus button').forEach(b=>b.classList.toggle('on',b.dataset.s===q.status));
@@ -346,60 +1139,450 @@
     }
     document.getElementById('qStatus').onclick=e=>{const b=e.target.closest('button');if(!b||!selId)return;const q=qc[selId]||{};q.status=(q.status===b.dataset.s?null:b.dataset.s);q.ts=Date.now();qc[selId]=q;save();renderQC(selId);renderList();};
     document.getElementById('qNotes').oninput=e=>{if(!selId)return;const q=qc[selId]||{};q.notes=e.target.value;q.ts=Date.now();qc[selId]=q;save();document.getElementById('qSaved').textContent='saved just now';renderList();};
-    document.getElementById('qcClose').onclick=()=>{document.getElementById('qc').classList.remove('on'); document.getElementById('qcReopen').style.display=selId?'inline-flex':'none';};
-    document.getElementById('qcReopen').onclick=()=>{if(!selId)return; document.getElementById('qc').classList.add('on'); document.getElementById('qcReopen').style.display='none';};
-    document.getElementById('qFly').onclick=()=>{if(!selId)return;const s=NE[selId].soma;const d=camera.position.clone().sub(controls.target);controls.target.set(s[0],s[1],s[2]);camera.position.copy(controls.target).add(d.setLength(2.2));};
+    document.getElementById('qcClose').onclick=()=>{document.getElementById('qc').classList.remove('on'); document.getElementById('qcReopen').style.display=selId?'inline-flex':'none'; syncInfoBtn();};
+    document.getElementById('qcReopen').onclick=()=>{if(!selId)return; document.getElementById('qc').classList.add('on'); document.getElementById('qcReopen').style.display='none'; syncInfoBtn();};
+    document.getElementById('qFly').onclick=flyToggle;
     function save(){localStorage.setItem(QKEY,JSON.stringify(qc));}
 
     function statusOf(id){return (qc[id]||{}).status||'unreviewed';}
     function filteredFor(a){
         const q=document.getElementById('search').value.trim().toLowerCase();
         const fs=document.getElementById('fStatus').value, so=document.getElementById('fSort').value;
+        const fm=document.getElementById('fMorph').value;
         let f=order.filter(id=>NE[id].area===a);
         if(isolate&&activeG) f=f.filter(id=>groups[activeG].ids.includes(id));
+        if(fm) f=f.filter(id=>(NE[id].morph_type||'')===fm);
         if(fs) f=f.filter(id=> fs==='unreviewed'?statusOf(id)==='unreviewed':statusOf(id)===fs);
         if(q) f=f.filter(id=>id.toLowerCase().includes(q)||NE[id].set.toLowerCase().includes(q));
         f.sort((x,y)=> so==='id'?x.localeCompare(y):NE[y][so]-NE[x][so]);
+        // SUB is ordered by the Saustad grouping first, so the tab reads by column
+        if(a==='SUB') f.sort((x,y)=>{
+            const sc=SUB_SCHEMES[subScheme];
+            const ix=sc.order.indexOf(subVal(x)), iy=sc.order.indexOf(subVal(y));
+            return (ix<0?99:ix)-(iy<0?99:iy) || x.localeCompare(y);
+        });
+        if(a==='SUB') f=f.filter(id=>!subOff[subVal(id)]);
         return f;
+    }
+    const showAll={};                       // areas the user expanded past the cap
+    const subOpen={};
+    // Every area expands into named subgroups that can be opened on their own,
+    // all at once, or neuron by neuron.  SUB uses the Saustad et al. cell-type
+    // scheme; the rest split by reconstruction type.
+    function subgroupsFor(a, ids){
+        if(a==='SUB'){
+            const sc=SUB_SCHEMES[subScheme], by={};
+            for(const id of ids){ const v=subVal(id)||'\u2014'; (by[v]=by[v]||[]).push(id); }
+            const order=sc.order.filter(v=>by[v]).concat(Object.keys(by).filter(v=>!sc.order.includes(v)));
+            return {label:'Saustad et al. \u00b7 '+sc.label,
+                    groups:order.map(v=>({key:v,name:v,color:sc.col[v]||AHEX[a],ids:by[v]}))};
+        }
+        const by={};
+        for(const id of ids){ const v=NE[id].morph_type||'other'; (by[v]=by[v]||[]).push(id); }
+        const NAME={full_morph:'full morphology',projections:'projection (axon only)',sub_ref:'reference'};
+        const order=['full_morph','projections','sub_ref','other'].filter(v=>by[v]);
+        return {label:'reconstruction type',
+                groups:order.map(v=>({key:v,name:NAME[v]||v,color:AHEX[a],ids:by[v]}))};
+    }
+    function rowHTML(id,a,hex,k){
+        const n=NE[id],q=qc[id]||{},st=q.status;
+        return `<div class="nrow ${id===selId?'on':''}" data-id="${id}" data-k="${k||''}">`+
+            `<span class="dot" style="background:${hex}"></span>`+
+            `<span class="id">${id}</span>`+
+            `<span class="tg">${a==='SUB'?subTag(id):''}${Math.round(n.len_um/1000)}mm `+
+            `${st?`<span class="st ${st}">${st}</span>`:''}`+
+            `${q.notes?'<i class="fa-solid fa-note-sticky ni"></i>':''}</span></div>`;
     }
     function renderList(){
         let total=0;
         document.getElementById('grouplist').innerHTML=AREAS.map(a=>{
             const f=filteredFor(a); total+=f.length; const op=openGrp[a];
-            const rows = op ? f.slice(0,150).map(id=>{
-                const n=NE[id],q=qc[id]||{},s=q.status;
-                return `<div class="nrow ${id===selId?'on':''}" data-id="${id}"><span class="dot" style="background:${AHEX[a]}"></span><span class="id">${id.replace(/_labeled$|_edited$/,'')}</span><span class="tg">${Math.round(n.len_um/1000)}mm ${s?`<span class="st ${s}">${s}</span>`:''}${q.notes?'<i class="fa-solid fa-note-sticky ni"></i>':''}</span></div>`;
-            }).join('') + (f.length>150?`<div class="grp-more">+${f.length-150} more — filter to narrow</div>`:'') : '';
+            let body='';
+            if(op){
+                const {label,groups}=subgroupsFor(a,f);
+                body=`<div class="subbar"><span>${label}</span>`+
+                     `<button data-sg-vis="${a}" title="show every arbor in this area">show all</button>`+
+                     `<button data-sg-all="${a}">open all</button>`+
+                     `<button data-sg-none="${a}">close all</button></div>`+
+                groups.map(g=>{
+                    const k=a+'|'+g.key, sop=subOpen[k];
+                    const cap=showAll[k]?g.ids.length:150;
+                    const rows=sop?g.ids.slice(0,cap).map(id=>rowHTML(id,a,g.color,k)).join('')+
+                        (g.ids.length>cap?`<div class="grp-more more-btn" data-a="${k}">+${g.ids.length-cap} more — click to show all</div>`:'')
+                        :'';
+                    return `<div class="sgrp ${sop?'open':''}">`+
+                        `<div class="sgrp-head" data-k="${k}"><span class="chev">\u25b6</span>`+
+                        `<span class="sw" style="background:${g.color}"></span>`+
+                        `<span class="nm">${g.name}</span>`+
+                        `<span class="sgvis" data-k="${k}" title="show these ${g.ids.length} arbors">\u2197</span>`+
+                        `<span class="cnt">${g.ids.length}</span></div>`+
+                        `<div class="grp-body">${rows}</div></div>`;
+                }).join('');
+            }
             return `<div class="grp ${op?'open':''}" data-a="${a}">
-                <div class="grp-head" data-a="${a}"><span class="chev">▶</span><span class="sw" style="background:${AHEX[a]}"></span><span class="nm">${a}</span><span class="cnt">${f.length}</span></div>
-                <div class="grp-body">${rows}</div></div>`;
+                <div class="grp-head" data-a="${a}"><span class="chev">\u25b6</span><span class="sw" style="background:${AHEX[a]}"></span><span class="nm">${a}</span><span class="cnt">${f.length}</span></div>
+                <div class="grp-body">${body}</div></div>`;
         }).join('');
         document.getElementById('listCount').textContent=total+' shown';
+        document.querySelectorAll('.more-btn').forEach(b=>b.onclick=ev=>{
+            ev.stopPropagation();
+            const a=b.dataset.a; showAll[a]=!showAll[a]; renderList();
+        });
         document.querySelectorAll('.grp-head').forEach(h=>h.onclick=()=>{const a=h.dataset.a;openGrp[a]=!openGrp[a];renderList();});
-        document.querySelectorAll('.nrow').forEach(r=>r.onclick=()=>select(r.dataset.id));
+        document.querySelectorAll('.sgrp-head').forEach(h=>h.onclick=ev=>{
+            ev.stopPropagation(); subOpen[h.dataset.k]=!subOpen[h.dataset.k]; renderList();
+        });
+        document.querySelectorAll('[data-sg-all]').forEach(b=>b.onclick=ev=>{
+            ev.stopPropagation(); const a=b.dataset.sgAll;
+            subgroupsFor(a,filteredFor(a)).groups.forEach(g=>subOpen[a+'|'+g.key]=true); renderList();
+        });
+        document.querySelectorAll('[data-sg-vis]').forEach(b=>b.onclick=ev=>{
+            ev.stopPropagation();
+            const a=b.dataset.sgVis, ids=filteredFor(a);
+            toggleArborSet('area:'+a, ids, b, 'show all');
+        });
+        document.querySelectorAll('.sgvis').forEach(b=>b.onclick=ev=>{
+            ev.stopPropagation();
+            const [a,key]=b.dataset.k.split('|');
+            const g=subgroupsFor(a,filteredFor(a)).groups.find(x=>x.key===key);
+            if(g) toggleArborSet('sg:'+b.dataset.k, g.ids, b, '\u2197');
+        });
+        document.querySelectorAll('[data-sg-none]').forEach(b=>b.onclick=ev=>{
+            ev.stopPropagation(); const a=b.dataset.sgNone;
+            // collapsing an area also clears what it put in the 3D view
+            subgroupsFor(a,filteredFor(a)).groups.forEach(g=>{
+                subOpen[a+'|'+g.key]=false; removeArborSet('sg:'+a+'|'+g.key);
+            });
+            removeArborSet('area:'+a); removeArborSet('a:'+a);
+            renderList();
+        });
+        document.querySelectorAll('.nrow').forEach(r=>r.onclick=()=>{
+            navArm(r.dataset.k); select(r.dataset.id);
+        });
+        syncArborButtons();
     }
-    ['search','fStatus','fSort'].forEach(id=>document.getElementById(id).addEventListener('input',renderList));
+    // renderList() rebuilds innerHTML, so freshly created buttons lose their
+    // state; re-derive it from what is actually in the scene.
+    function syncArborButtons(){
+        document.querySelectorAll('[data-sg-vis]').forEach(b=>{
+            const on=regionArbors.has('area:'+b.dataset.sgVis)||arborPending.has('area:'+b.dataset.sgVis);
+            b.classList.toggle('on',on); b.textContent=on?'hide all':'show all';
+        });
+        document.querySelectorAll('.sgvis').forEach(b=>{
+            const on=regionArbors.has('sg:'+b.dataset.k)||arborPending.has('sg:'+b.dataset.k);
+            b.classList.toggle('on',on); b.textContent=on?'\u25a0':'\u2197';
+        });
+        document.querySelectorAll('.legend .ab.swc').forEach(b=>{
+            const on=regionArbors.has('a:'+b.dataset.a)||arborPending.has('a:'+b.dataset.a);
+            b.classList.toggle('on',on); b.textContent=on?'\u25a0':'\u2197';
+        });
+    }
+    ['search','fStatus','fSort','fMorph'].forEach(id=>document.getElementById(id).addEventListener('input',renderList));
 
+    function rebuildSub(){
+        const a='SUB';
+        if(!somaObj[a]) return;
+        const old=somaObj[a];
+        root.remove(old); old.geometry.dispose(); old.material.dispose();
+        const ids=order.filter(id=>NE[id].area===a&&!subOff[subVal(id)]);
+        const pos=new Float32Array(ids.length*3), col=new Float32Array(ids.length*3);
+        ids.forEach((id,i)=>{const s0=NE[id].soma;
+            pos[i*3]=s0[0];pos[i*3+1]=s0[1];pos[i*3+2]=s0[2];
+            const c=new THREE.Color(subHex(id)); col[i*3]=c.r;col[i*3+1]=c.g;col[i*3+2]=c.b;});
+        const g=new THREE.BufferGeometry();
+        g.setAttribute('position',new THREE.BufferAttribute(pos,3));
+        g.setAttribute('color',new THREE.BufferAttribute(col,3));
+        g.userData.ids=ids;
+        const pts=new THREE.Points(g,new THREE.PointsMaterial({vertexColors:true,size:4.5,sizeAttenuation:false}));
+        pts.userData.area=a;
+        pts.visible=areaOn[a]&&document.getElementById('tSoma').checked;
+        root.add(pts); somaObj[a]=pts;
+        buildSubLegend();
+    }
+    function recolorSubArbors(){
+        for(const [id,l] of arbors){
+            if(!NE[id]||NE[id].area!=='SUB') continue;
+            const g=l.geometry, u=g.userData;
+            if(!u||!u.colArea) continue;
+            const n=u.colArea.length/3;
+            const T=u.types||null;
+            const c=areaShadeColors(n,T,id);
+            u.colArea.set(c);
+            if(arborComp){ g.setAttribute('color',new THREE.BufferAttribute(u.colArea,3)); }
+            else g.attributes.color.needsUpdate=true;
+            if(g.attributes.color) g.attributes.color.needsUpdate=true;
+        }
+        // merged group sets bake colour in, so drop any that contain SUB
+        for(const k of [...regionArbors.keys()]) removeArborSet(k);
+        document.querySelectorAll('.arb,.ab.swc,.sgvis,[data-sg-vis]').forEach(b=>{
+            b.classList.remove('on');
+            if(b.classList.contains('ab')||b.classList.contains('sgvis')) b.textContent='\u2197';
+        });
+    }
+    function buildSubLegend(){
+        const el=document.getElementById('subLegend');
+        if(!el) return;
+        const has=order.some(id=>NE[id].area==='SUB');
+        el.style.display=has?'block':'none';
+        if(!has) return;
+        const sc=SUB_SCHEMES[subScheme];
+        const cnt={};
+        for(const id of order) if(NE[id].area==='SUB'){const v=subVal(id);cnt[v]=(cnt[v]||0)+1;}
+        const vals=sc.order.filter(v=>cnt[v])
+            .concat(Object.keys(cnt).filter(v=>!sc.order.includes(v)&&v));
+
+        const row=(v,indent)=>`<div class="item subi ${subOff[v]?'off':''}" data-v="${v}"`+
+            `${indent?' style="padding-left:22px"':''} title="click to toggle \u00b7 alt-click to isolate">`+
+            `<span class="sw" style="background:${sc.col[v]||'#9aa7b4'}"></span>${v||'\u2014'}`+
+            `<span class="c">${cnt[v]}</span></div>`;
+
+        let body='';
+        if(subScheme==='celltype'){
+            // group the 12 cell types under their column, so a
+            // whole column or a whole layer can be chosen in one click
+            const bycol={};
+            for(const v of vals){ const c=v.slice(0,v.lastIndexOf('_'));
+                (bycol[c]=bycol[c]||[]).push(v); }
+            const corder=['SUBdd','SUBdv','ProSUB','SUBv','SUBvv'].filter(c=>bycol[c]);
+            body=`<div class="subchips">`+['1','2','3','4'].map(L=>{
+                const n=vals.filter(v=>v.endsWith('_'+L)).reduce((a,v)=>a+cnt[v],0);
+                return n?`<span class="chip" data-layer="${L}" style="border-color:${SUB_LAY[L]}"`+
+                    ` title="toggle every SUB_${L} group"><i style="background:${SUB_LAY[L]}"></i>SUB_${L}`+
+                    `<b>${n}</b></span>`:'';
+            }).join('')+`</div>`;
+            body+=corder.map(c=>{
+                const n=bycol[c].reduce((a,v)=>a+cnt[v],0);
+                return `<div class="subgrp" data-col="${c}" title="toggle the whole ${c} column">`+
+                    `<span class="sw" style="background:${SUB_COL[c]}"></span><b>${c}</b>`+
+                    `<span class="c">${n}</span></div>`+bycol[c].map(v=>row(v,1)).join('');
+            }).join('');
+        } else body=vals.map(v=>row(v,0)).join('');
+
+        el.innerHTML=`<h4>sub \u00b7 saustad ${sc.label}</h4>`+
+            `<div style="margin:-2px 0 5px"><select id="subSchemeSel" style="width:100%">`+
+            Object.keys(SUB_SCHEMES).map(k=>`<option value="${k}" ${k===subScheme?'selected':''}>by ${SUB_SCHEMES[k].label}</option>`).join('')+
+            `</select></div>`+
+            `<div class="subbtns"><button data-act="all">all</button>`+
+            `<button data-act="none">none</button>`+
+            `<button data-act="inv">invert</button></div>`+body;
+
+        const refresh=()=>{ rebuildSub(); recolorSubArbors(); renderList(); };
+        document.getElementById('subSchemeSel').onchange=e=>{
+            subScheme=e.target.value;
+            for(const k in subOff) delete subOff[k];
+            refresh();
+        };
+        el.querySelectorAll('.subbtns button').forEach(b=>b.onclick=()=>{
+            const a=b.dataset.act;
+            vals.forEach(v=>{ subOff[v]= a==='none' ? true : a==='all' ? false : !subOff[v]; });
+            refresh();
+        });
+        el.querySelectorAll('.subi').forEach(it=>it.onclick=ev=>{
+            const v=it.dataset.v;
+            if(ev.altKey){                                  // isolate this group
+                const solo=vals.every(x=>x===v?!subOff[x]:subOff[x]);
+                vals.forEach(x=>subOff[x]= solo ? false : x!==v);
+            } else subOff[v]=!subOff[v];
+            refresh();
+        });
+        el.querySelectorAll('.subgrp').forEach(h=>h.onclick=ev=>{
+            const mine=vals.filter(v=>v.startsWith(h.dataset.col+'_'));
+            if(ev.altKey){ vals.forEach(v=>subOff[v]=!mine.includes(v)); }
+            else { const want=mine.some(v=>subOff[v]); mine.forEach(v=>subOff[v]=!want); }
+            refresh();
+        });
+        el.querySelectorAll('.chip').forEach(c=>c.onclick=ev=>{
+            const L=c.dataset.layer, mine=vals.filter(v=>v.endsWith('_'+L));
+            if(ev.altKey){ vals.forEach(v=>subOff[v]=!mine.includes(v)); }
+            else { const want=mine.some(v=>subOff[v]); mine.forEach(v=>subOff[v]=!want); }
+            refresh();
+        });
+        // dim headers whose members are all hidden
+        el.querySelectorAll('.subgrp').forEach(h=>h.classList.toggle('off',
+            vals.filter(v=>v.startsWith(h.dataset.col+'_')).every(v=>subOff[v])));
+        el.querySelectorAll('.chip').forEach(c=>c.classList.toggle('off',
+            vals.filter(v=>v.endsWith('_'+c.dataset.layer)).every(v=>subOff[v])));
+    }
     function buildLegend(){
-        document.getElementById('legend').innerHTML='<h4>areas · click to toggle</h4>'+AREAS.map(a=>`<div class="item" data-a="${a}"><span class="sw" style="background:${AHEX[a]}"></span>${a}<span class="c">${META.counts[a]}</span></div>`).join('');
-        document.querySelectorAll('.legend .item').forEach(it=>it.onclick=()=>{const a=it.dataset.a;areaOn[a]=!areaOn[a];it.classList.toggle('off',!areaOn[a]);somaObj[a].visible=areaOn[a]&&document.getElementById('tSoma').checked; if(document.getElementById('tArbors').checked)toggleArbors(); updateHud();});
+        // Two independent switches per area - somas and SWC arbors - so several
+        // areas can be combined, e.g. CA1 somas beside CA3 arbors.  The whole
+        // row is no longer one click: the dots are the controls.
+        document.getElementById('legend').innerHTML=
+            '<h4>areas · soma / swc</h4>'+
+            AREAS.map(a=>`<div class="item arow" data-a="${a}">`+
+                `<span class="sw" style="background:${AHEX[a]}"></span>`+
+                `<span class="an">${a}</span>`+
+                `<span class="c">${META.counts[a]}</span>`+
+                `<span class="ab soma on" data-a="${a}" title="soma markers">\u25cf</span>`+
+                `<span class="ab swc" data-a="${a}" title="all arbors for this area">\u2197</span>`+
+                `<span class="ab trv" data-a="${a}" title="step through each neuron in this area">\u21c4</span>`+
+                `<span class="ab msh" data-a="${a}" title="CCF mesh for this area">\u25c7</span>`+
+
+                `</div>`).join('');
+        document.querySelectorAll('.legend .ab.soma').forEach(b=>b.onclick=ev=>{
+            ev.stopPropagation();
+            const a=b.dataset.a;
+            areaOn[a]=!areaOn[a];
+            b.classList.toggle('on',areaOn[a]);
+            b.closest('.item').classList.toggle('off',!areaOn[a]);
+            somaObj[a].visible=areaOn[a]&&document.getElementById('tSoma').checked;
+            applySetComp();
+            if(document.getElementById('tArbors').checked)toggleArbors();
+            updateHud();
+        });
+        // Per-area mesh switch: one press shows that area's CCF surface on its
+        // own.  An area with no surface gets a disabled control rather than a
+        // button that silently does nothing.
+        document.querySelectorAll('.legend .ab.msh').forEach(b=>{
+            const a=b.dataset.a, acr=CCF_OF_AREA[a];
+            const mine=()=>ccf.parts.filter(q=>q.r.name===acr);
+            if(!mine().length){ b.classList.add('dis'); b.title='no CCF surface for '+a; return; }
+            b.onclick=ev=>{
+                ev.stopPropagation();
+                const items=mine(), all=ccf.parts;
+                const cb=document.getElementById('tCcf');
+                // already showing this ROI and nothing else -> second press clears it
+                const solo = kindOn.ccf && all.every(q=>q.on===items.includes(q));
+                if(solo){
+                    items.forEach(q=>q.on=false);
+                    kindOn.ccf=false; if(cb) cb.checked=false;
+                } else {
+                    all.forEach(q=>q.on=items.includes(q));
+                    kindOn.ccf=true; if(cb) cb.checked=true;
+                }
+                applyOverlay();
+                syncAreaMeshButtons();
+                refreshMeshRows();
+            };
+            b.classList.toggle('on',kindOn.ccf&&mine().every(q=>q.on));
+        });
+        document.querySelectorAll('.legend .ab.trv').forEach(b=>b.onclick=ev=>{
+            ev.stopPropagation();
+            const a=b.dataset.a;
+            // honour the sidebar's search / status filter, so narrowing the list
+            // narrows what you step through
+            const f=filteredFor(a);
+            startTraverse(a+(f.length<META.counts[a]?' (filtered)':''),f);
+        });
+        document.querySelectorAll('.legend .ab.swc').forEach(b=>b.onclick=ev=>{
+            ev.stopPropagation();
+            const a=b.dataset.a;
+            const ids=order.filter(id=>NE[id].area===a);
+            toggleArborSet('a:'+a,ids,b,'\u2197');
+        });
     }
     function updateHud(){const n=AREAS.filter(a=>areaOn[a]).reduce((s,a)=>s+META.counts[a],0);document.getElementById('hud').innerHTML=`<b>${n.toLocaleString()}</b> neurons${selId?` · sel <b>${selId.replace(/_labeled$|_edited$/,'')}</b>`:''}`;}
 
+    // One merged set per area rather than one line per neuron: the compartment
+    // checkboxes reach it, an area switched off takes its arbors with it, and
+    // the whole dataset is ~30 draw calls instead of ~9,000.
     async function toggleArbors(){
         const want=()=>document.getElementById('tArbors').checked;
-        if(!want()){ for(const[,l]of arbors) l.visible=false; return; }
-        const lists=AREAS.map(a=>order.filter(i=>NE[i].area===a));
-        const maxLen=Math.max(0,...lists.map(l=>l.length));
-        for(let k=0;k<maxLen;k++){
-            for(let ai=0;ai<AREAS.length;ai++){
-                const id=lists[ai][k]; if(id===undefined) continue;
-                if(!want()){ for(const[,l]of arbors) l.visible=false; return; }
-                const l=await loadArbor(id); l.visible=want()&&areaOn[AREAS[ai]]&&id!==selId;
-            }
+        const areaBtn=a=>document.querySelector('.legend .ab.swc[data-a="'+a+'"]');
+        if(!want()){
+            for(const a of AREAS) removeArborSet('a:'+a);
+            for(const[,l]of arbors) l.visible=false;
+            syncArborButtons(); return;
         }
+        // smallest areas first, so something is on screen while CA1's 3,000
+        // neurons are still coming in
+        for(const a of [...AREAS].sort((x,y)=>META.counts[x]-META.counts[y])){
+            if(!want()) return;
+            if(!areaOn[a]) continue;
+            const key='a:'+a;
+            if(regionArbors.has(key)||arborPending.has(key)) continue;
+            await toggleArborSet(key, order.filter(id=>NE[id].area===a), areaBtn(a), '\u2197');
+        }
+        applySetComp();
     }
     document.getElementById('tArbors').onchange=toggleArbors;
+    const kindOn={ccf:false};
+    function applyOverlay(){
+        if(ccf.group) ccf.group.visible=kindOn.ccf;
+        for(const p of ccf.parts) p.mesh.visible=p.on&&kindOn.ccf;
+        if(selMesh&&!selMesh.mesh.visible){ selMesh=null; }
+        if(typeof applyMeshSelection==='function') applyMeshSelection();
+        const c=document.getElementById('ccfLegend');
+        if(c) c.style.display=kindOn.ccf?'block':'none';
+    }
+    function syncAreaMeshButtons(){
+        document.querySelectorAll('.legend .ab.msh').forEach(b=>{
+            const acr=CCF_OF_AREA[b.dataset.a];
+            const mine=ccf.parts.filter(q=>q.r.name===acr);
+            if(mine.length) b.classList.toggle('on',kindOn.ccf&&mine.every(q=>q.on));
+        });
+    }
+    function refreshMeshRows(){
+        const el=document.getElementById('ccfLegend');
+        if(!el) return;
+        el.querySelectorAll('.hgi').forEach(n=>{
+            const q=ccf.parts[+n.dataset.i];
+            if(q) n.classList.toggle('off',!q.on);
+        });
+        el.querySelectorAll('.hgrp').forEach(h=>h.classList.toggle('off',
+            !ccf.parts.some(q=>q.r.parent===h.dataset.p&&q.on)));
+    }
+    ccf.sync=()=>{ syncAreaMeshButtons(); refreshMeshRows(); };
+    ccf.apply=applyOverlay;
+    document.getElementById('selClose').onclick=deselect;
+    // ⓘ toggles the info panel the same way ✦ toggles the zoom
+    function infoToggle(){
+        if(!selId) return;
+        const qcEl=document.getElementById('qc');
+        const open=!qcEl.classList.contains('on');
+        qcEl.classList.toggle('on',open);
+        document.getElementById('qcReopen').style.display=open?'none':'inline-flex';
+        syncInfoBtn();
+    }
+    function syncInfoBtn(){
+        const b=document.getElementById('selInfo');
+        if(!b) return;
+        const open=document.getElementById('qc').classList.contains('on');
+        b.classList.toggle('on',open);
+        b.title=open?'close the info panel':'open the info panel';
+    }
+    document.getElementById('selInfo').onclick=infoToggle;
+    // Fly toggles: first press zooms to the soma, the next restores the view
+    // you were looking at before.
+    let flyFrom=null;
+    function flyToggle(){
+        if(!selId) return;
+        const btn=document.getElementById('selFly');
+        if(flyFrom){
+            camera.position.copy(flyFrom.pos);
+            controls.target.copy(flyFrom.tgt);
+            controls.update();
+            flyFrom=null;
+            if(btn){ btn.classList.remove('on'); btn.title='fly to this soma'; }
+            return;
+        }
+        flyFrom={pos:camera.position.clone(), tgt:controls.target.clone()};
+        const s0=NE[selId].soma, d=camera.position.clone().sub(controls.target);
+        controls.target.set(s0[0],s0[1],s0[2]);
+        camera.position.copy(controls.target).add(d.setLength(2.2));
+        controls.update();
+        if(btn){ btn.classList.add('on'); btn.title='zoom back out'; }
+    }
+    document.getElementById('selFly').onclick=flyToggle;
+    addEventListener('keydown',e=>{
+        if(e.key!=='Escape'||!selId) return;
+        const t=e.target.tagName; if(t==='INPUT'||t==='TEXTAREA') return;
+        if(trav.ids.length) return;              // Esc already ends traversal
+        deselect();
+    });
+    document.getElementById('clearBtn').onclick=()=>{ clearAllArbors(); renderList(); updateHud(); };
+    document.getElementById('tArbComp').onchange=e=>{arborComp=e.target.checked;applyArborMat();};
+    document.getElementById('tCcf').onchange=e=>{
+        kindOn.ccf=e.target.checked;
+        // turning the layer on with every structure hidden would do nothing
+        if(kindOn.ccf&&!ccf.parts.some(q=>q.on))
+            ccf.parts.forEach(q=>{ q.on=true; });
+        applyOverlay(); syncAreaMeshButtons(); refreshMeshRows();
+    };
+    document.getElementById('meshOp').oninput=e=>{
+        ccf.op=e.target.value/100;
+        applyMeshSelection();
+    };
     document.getElementById('tSoma').onchange=e=>{const on=e.target.checked;for(const a of AREAS)somaObj[a].visible=!(isolate&&activeG)&&areaOn[a]&&on;if(batchSomas)batchSomas.visible=on;};
 
     document.getElementById('btnExport').onclick=()=>{
@@ -426,9 +1609,20 @@
             ids.forEach((id,i)=>{const p=NE[id].soma;pos[i*3]=p[0];pos[i*3+1]=p[1];pos[i*3+2]=p[2];});
             const g=new THREE.BufferGeometry();g.setAttribute('position',new THREE.BufferAttribute(pos,3));g.userData.ids=ids;
             batchSomas=new THREE.Points(g,new THREE.PointsMaterial({color:0xffffff,size:6.5,sizeAttenuation:false}));batchSomas.visible=showSoma;root.add(batchSomas);
-            for(const[id,l]of arbors) l.visible=ids.includes(id)&&id!==selId;
-            if(document.getElementById('tArbors').checked) ids.forEach(id=>{if(id!==selId)loadArbor(id).then(l=>{l.visible=true;});});
-        } else if(!document.getElementById('tArbors').checked){ for(const[id,l]of arbors) l.visible=false; }
+            // isolating drops every loaded set and draws the batch as one
+            // merged set, so it stays under the compartment toggles too
+            for(const key of [...regionArbors.keys()]) removeArborSet(key);
+            for(const[,l]of arbors) l.visible=false;
+            syncArborButtons();
+            if(document.getElementById('tArbors').checked && ids.length)
+                toggleArborSet('batch:'+activeG, ids, null, '');
+        } else {
+            for(const[,l]of arbors) l.visible=false;
+            for(const key of [...regionArbors.keys()])
+                if(key.startsWith('batch:')) removeArborSet(key);
+            syncArborButtons();
+            if(document.getElementById('tArbors').checked) toggleArbors();
+        }
     }
     document.getElementById('bAdd').onclick=()=>{const nm=document.getElementById('bNew').value.trim();if(!nm)return;if(!groups[nm])groups[nm]={ids:[],note:'',ts:Date.now()};activeG=nm;document.getElementById('bNew').value='';saveG();renderBatch();renderList();};
     document.getElementById('bSel').onchange=e=>{activeG=e.target.value;isolate=false;renderBatch();renderList();updateHud();};
@@ -455,10 +1649,20 @@
     async function boot(){
         META=await (await fetch(DATA+'neurons.json')).json();
         NE=META.neurons; AREAS=META.areas; order=Object.keys(NE);
+        // populate the colour maps and visibility flags from the manifest
+        for(const a of AREAS){
+            const hex = (META.areaColor && META.areaColor[a]) || '#9aa7b4';
+            AHEX[a] = hex;
+            AC[a] = parseInt(hex.slice(1), 16);
+            areaOn[a] = 1;
+        }
+        await loadCcf();
         const b=await loadBin(DATA+'brain.bin');
         brain=new THREE.Mesh(meshGeom(b.P,b.E),new THREE.MeshStandardMaterial({color:0xaebccb,transparent:true,opacity:0.08,roughness:1,metalness:0,side:THREE.BackSide,depthWrite:false}));
+        brain.renderOrder=10; brain.frustumCulled=false;
         root.add(brain);
-        buildSomas(); buildLegend(); renderList(); updateHud(); renderBatch();
+        await loadSomaCcf();
+        buildSomas(); buildLegend(); buildSubLegend(); renderList(); updateHud(); renderBatch();
         sceneBox=new THREE.Box3();
         for(const id of order){const s=NE[id].soma;sceneBox.expandByPoint(new THREE.Vector3(s[0],s[1],s[2]));}
         const sz=sceneBox.getSize(new THREE.Vector3()).length();
@@ -469,6 +1673,14 @@
     }
     function resize(){const r=canvas.parentElement.getBoundingClientRect();const w=Math.max(1,Math.round(r.width)),h=Math.max(1,Math.round(r.height));if(canvas.width!==w||canvas.height!==h){renderer.setSize(w,h,false);camera.aspect=w/h;camera.updateProjectionMatrix();}}
     (function loop(){resize();controls.update();renderer.render(scene,camera);requestAnimationFrame(loop);})();
+    window.__diag=function(){
+        try{
+            return 'neurons='+(typeof NE==='object'&&NE?Object.keys(NE).length:'nil')
+                 +' areas='+(AREAS?AREAS.length:'nil')
+                 +' somaObj='+Object.keys(somaObj).length
+                 +' children='+(root?root.children.length:'nil');
+        }catch(e){ return 'diag-threw:'+e.message; }
+    };
     boot();
 </script>
 </body>
