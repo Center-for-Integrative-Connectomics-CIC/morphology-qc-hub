@@ -35,6 +35,11 @@ python3 -m http.server 8000
   arbor loads, colour-coded by compartment (axon blue, basal red, apical yellow). Once a
   neuron is selected, **↑ / ↓** steps through the rest of its group without going back
   to the list.
+- **Stack** — `+` on a list row, or `P` on the selected neuron, keeps that
+  reconstruction in the view. Pick as many as you like from any mix of areas;
+  each one gets a row in the stack panel to show, hide or drop it. "Stack every
+  pick" adds every neuron you click, so `↑ / ↓` builds a stack as it walks a
+  subgroup. The stack is kept in the browser and survives a reload.
 - **Areas and subgroups** — each area in the list expands into named subgroups that can
   be opened one at a time, all at once, or neuron by neuron. SUB is grouped by the
   Saustad et al. scheme (column, layer, projection class or cell type) and coloured with

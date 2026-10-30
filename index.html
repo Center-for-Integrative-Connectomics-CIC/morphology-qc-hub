@@ -84,6 +84,9 @@
         .nrow .st{font-size:9.5px;padding:1px 6px;border-radius:9px;border:1px solid var(--line);color:var(--muted-2)}
         .nrow .st.pass{color:var(--pass);border-color:var(--pass)} .nrow .st.flag{color:var(--flag);border-color:var(--flag)} .nrow .st.redo{color:var(--redo);border-color:var(--redo)}
         .nrow .ni{color:var(--accent)}
+        .nrow .pinb{font-family:var(--mono);font-size:11px;line-height:1.35;color:var(--muted-2);
+            border:1px solid var(--line);border-radius:4px;padding:0 4px;cursor:pointer;flex:none}
+        .nrow .pinb:hover,.nrow .pinb.on{background:var(--accent);color:#fff;border-color:var(--accent)}
         .grp-more{padding:7px 13px 7px 30px;font-family:var(--mono);font-size:10.5px;color:var(--muted-2);border-top:1px solid var(--line)}
 
         .stage{position:relative;min-width:0;background:radial-gradient(ellipse at 50% 34%,#1b2733 0%,#0c1116 100%)}
@@ -128,6 +131,13 @@
         .legend .ab.on{background:var(--accent);color:#f2fbf8;border-color:var(--accent);font-weight:600}
         .legend .ab.dis{opacity:.28;cursor:not-allowed}
         .legend .ab.dis:hover{background:none;color:#8fb8b0;border-color:rgba(255,255,255,.14)}
+        .legend .pini .pn{font-family:var(--mono);font-size:10.5px;max-width:96px;white-space:nowrap;
+            overflow:hidden;text-overflow:ellipsis}
+        .legend .pini .c{font-size:9.5px}
+        .legend .pini.load .pn{opacity:.5}
+        .legend .px{font-size:10px;line-height:1.5;color:#8fb8b0;border:1px solid rgba(255,255,255,.14);
+            border-radius:4px;padding:0 4px;cursor:pointer;flex:none}
+        .legend .px:hover{background:#b5424c;color:#fff;border-color:#b5424c}
         .sub-head{display:flex;align-items:center;gap:8px;padding:8px 11px;cursor:pointer;
             border-bottom:1px solid var(--line);font-size:12px}
         .sub-head:hover{background:rgba(255,255,255,.04)}
@@ -273,6 +283,8 @@
             <label title="Area hue with axon/dendrite shaded differently; off = pure compartment colours"><input type="checkbox" id="tArbComp" checked> area + compartment shading</label>
             <label><input type="checkbox" id="tCcf"> CCF structures</label>
             <label style="gap:6px">opacity <input type="range" id="meshOp" min="4" max="100" value="22" style="width:84px;accent-color:#7a5cf0"></label>
+            <div class="tdiv" title="Hand-pick neurons from any mix of areas and keep them all in the view">stack</div>
+            <label title="Every neuron you pick is added to the stack and stays in the view until you remove it"><input type="checkbox" id="tStack"> stack every pick</label>
             <div class="tdiv" title="Applies to the selected neuron and to every loaded group at once">compartments</div>
             <label><input type="checkbox" class="cComp" data-c="axon" checked> <i class="csw" style="background:#4aa3ff"></i> axon</label>
             <label><input type="checkbox" class="cComp" data-c="basal" checked> <i class="csw" style="background:#ff5d5d"></i> basal dendrite</label>
@@ -281,6 +293,11 @@
         </div>
         </div>
         <div id="rightPanels" style="position:absolute;right:14px;bottom:14px;width:218px;z-index:4;display:flex;flex-direction:column;gap:9px;align-items:stretch">
+            <div class="legend mesh" id="pinPanel" style="position:static;max-height:34vh;overflow-y:auto;display:none">
+                <h4 id="pinHead">stack</h4>
+                <div class="subbtns"><button id="pinAll">show all</button><button id="pinNone">hide all</button><button id="pinClr">clear</button></div>
+                <div id="pinRows"></div>
+            </div>
             <div class="legend mesh" id="meshInfo" style="position:static;display:none"></div>
             <div class="legend mesh" id="ccfLegend" style="position:static;max-height:28vh;overflow-y:auto;display:none">
                 <h4>ccf structures · click to toggle</h4>
@@ -288,11 +305,12 @@
         </div>
         <button id="qcReopen" title="Show info panel"><i class="fa-solid fa-circle-info"></i> info panel</button>
         <div class="hud" id="hud"><b>0</b> neurons</div>
-        <div class="hint">drag rotate · scroll zoom · right-drag pan · click a soma · ↑↓ step through the list</div>
+        <div class="hint">drag rotate · scroll zoom · right-drag pan · click a soma · ↑↓ step through the list · P stacks the pick</div>
         <div id="selchip">
             <span class="sw" id="selDot"></span>
             <span id="selName"></span>
             <span id="selPos" title="↑ / ↓ steps through this list"></span>
+            <button id="selPin" title="add to the stack (P)">＋</button>
             <button id="selFly" title="fly to this soma">⌖</button>
             <button id="selInfo" title="open the info panel">ⓘ</button>
             <button id="selClose" title="deselect (Esc)">✕</button>
@@ -793,6 +811,7 @@
         document.getElementById('qcReopen').style.display='none';
         document.getElementById('selchip').classList.remove('on');
         syncInfoBtn();
+        syncPinBtns();
         renderList(); updateHud();
     }
     function showSelChip(id){
@@ -805,6 +824,7 @@
         el.classList.add('on');
         navPos();
         syncInfoBtn();
+        syncPinBtns();
     }
     async function select(id){
         // selComp draws the selection split by compartment, so the unsplit
@@ -816,6 +836,7 @@
         await buildSelComp(id);
         if(selId!==id){ flyFrom=null; }
         showSelChip(id);
+        if(stackPicks) pinAdd(id);
         renderQC(id); renderList(); updateHud();
     }
 
@@ -870,6 +891,12 @@
             const live = !g.userData.area || areaOn[g.userData.area];
             g.children.forEach(c=>c.visible = live && !!setComp[c.userData.cls]);
         }
+        // stacked picks are explicit, so they ignore the area switches - only
+        // their own row in the stack panel and the compartment boxes reach them
+        for(const[,p]of pins){
+            if(!p.grp) continue;
+            p.grp.children.forEach(c=>c.visible = p.on && !!setComp[c.userData.cls]);
+        }
     }
 
     async function fetchPool(urls, limit, onStep){
@@ -919,6 +946,7 @@
     function clearAllArbors(){
         for(const key of [...regionArbors.keys()]) removeArborSet(key);
         arborPending.clear();
+        pinClear();
         for(const [,l] of arbors) l.visible=false;
         const t=document.getElementById('tArbors'); if(t) t.checked=false;
         document.querySelectorAll('.arb,.ab.swc,.sgvis,[data-sg-vis]').forEach(b=>{
@@ -988,6 +1016,146 @@
     }
     const toggleRegionArbors=(part,btn)=>
         toggleArborSet('r:'+part.r.idx,regionNeurons(part.r),btn,regionNeurons(part.r).length);
+
+    // A stack of hand-picked neurons kept in the view all at once, in any mix
+    // of areas, added and removed one at a time with no cap.  Selecting a
+    // neuron still replaces the single selection the info panel reads; the
+    // stack is a separate, purely visual layer on top of it, so a pick stays
+    // on screen after the selection moves on.  Each pinned neuron is its own
+    // group split by compartment, so the compartment boxes reach it and the
+    // row in the panel switches it alone.
+    const pins=new Map();                           // id -> {grp, on}
+    const SKEY='pdh_stack_v1';
+    const savePins=()=>{ try{ localStorage.setItem(SKEY,JSON.stringify([...pins.keys()])); }catch(e){} };
+
+    async function pinBuild(id){
+        const b=await loadBin(SWC+id+'.bin');
+        const DT=displayTypes(b);
+        let col;
+        if(arborComp) col=areaShadeColors(b.nP,DT,id);
+        else { col=new Float32Array(b.nP*3);
+               for(let i=0;i<b.nP;i++){const c=NUM_COL[DT[i]]||NUM_COL[0];
+                   col[i*3]=c.r; col[i*3+1]=c.g; col[i*3+2]=c.b;} }
+        const posAttr=new THREE.BufferAttribute(b.P,3);
+        const colAttr=new THREE.BufferAttribute(col,3);
+        const cls=effClassArr(b.nP,b.E,b.nE,DT);
+        const buckets=emptyBuckets();
+        for(let k=0;k<b.nE;k++){const a=b.E[k*2],c=b.E[k*2+1]; buckets[COMP_KINDS[cls[c]]].push(a,c);}
+        const grp=new THREE.Group(); grp.userData.pin=id;
+        for(const c in buckets){
+            if(!buckets[c].length) continue;
+            const gg=new THREE.BufferGeometry();
+            gg.setAttribute('position',posAttr); gg.setAttribute('color',colAttr);
+            gg.setIndex(new THREE.BufferAttribute(new Uint32Array(buckets[c]),1));
+            gg.computeBoundingSphere();
+            const ln=new THREE.LineSegments(gg,new THREE.LineBasicMaterial({
+                vertexColors:true,transparent:true,opacity:0.92}));
+            ln.frustumCulled=false; ln.renderOrder=2; ln.userData.cls=c;
+            grp.add(ln);
+        }
+        return grp;
+    }
+    // The slot goes in before the fetch, so a second click on the same neuron
+    // cannot start a second build and orphan the first group in the scene.
+    async function pinAdd(id){
+        if(!id||!NE[id]||pins.has(id)) return;
+        pins.set(id,{grp:null,on:true});
+        renderPins();
+        let grp;
+        try{ grp=await pinBuild(id); }
+        catch(e){ console.warn('stack: '+id+' failed to load',e); pins.delete(id); renderPins(); return; }
+        const slot=pins.get(id);
+        if(!slot){ disposeObj(grp); return; }       // removed while it loaded
+        slot.grp=grp; root.add(grp);
+        applySetComp(); renderPins(); savePins();
+    }
+    function pinRemove(id){
+        const p=pins.get(id);
+        if(p&&p.grp){ root.remove(p.grp); disposeObj(p.grp); }
+        pins.delete(id); renderPins(); savePins();
+    }
+    function pinToggle(id){
+        const p=pins.get(id);
+        if(!p) return;
+        p.on=!p.on; applySetComp(); renderPins();
+    }
+    function pinSet(id){ pins.has(id)?pinRemove(id):pinAdd(id); }
+    function pinAllOn(on){
+        for(const[,p]of pins) p.on=on;
+        applySetComp(); renderPins();
+    }
+    function pinClear(){
+        for(const id of [...pins.keys()]) pinRemove(id);
+    }
+    // Colour is baked into the geometry, so a colour-mode change has to rebuild
+    // the stack rather than restyle it.  Visibility is carried across.
+    async function pinRebuild(){
+        const was=[...pins.keys()].map(id=>[id,pins.get(id).on]);
+        pinClear();
+        for(const[id]of was) await pinAdd(id);
+        for(const[id,on]of was){ const p=pins.get(id); if(p) p.on=on; }
+        applySetComp(); renderPins();
+    }
+    const shortId = id => id.replace(/_labeled$|_edited$/,'');
+    function renderPins(){
+        const el=document.getElementById('pinPanel'), rows=document.getElementById('pinRows');
+        if(!el||!rows) return;
+        el.style.display=pins.size?'block':'none';
+        const live=[...pins.values()].filter(p=>p.on).length;
+        document.getElementById('pinHead').textContent=
+            'stack \u00b7 '+pins.size+' picked'+(live<pins.size?' \u00b7 '+live+' shown':'');
+        rows.innerHTML=[...pins.keys()].map(id=>{
+            const a=NE[id].area, p=pins.get(id);
+            const hex=(a==='SUB'?subHex(id):AHEX[a])||'#9aa7b4';
+            return `<div class="item pini ${p.on?'':'off'} ${p.grp?'':'load'}" data-id="${id}" `+
+                `title="click to show / hide \u00b7 double-click to select">`+
+                `<span class="sw" style="background:${hex}"></span>`+
+                `<span class="pn">${shortId(id)}</span>`+
+                `<span class="c" style="margin-left:auto">${p.grp?a:'\u2026'}</span>`+
+                `<span class="px" data-x="${id}" title="remove from the stack">\u2715</span></div>`;
+        }).join('');
+        rows.querySelectorAll('.pini').forEach(r=>{
+            r.onclick=()=>pinToggle(r.dataset.id);
+            r.ondblclick=()=>select(r.dataset.id);
+        });
+        rows.querySelectorAll('.px').forEach(b=>b.onclick=ev=>{
+            ev.stopPropagation(); pinRemove(b.dataset.x);
+        });
+        syncPinBtns();
+    }
+    // renderList() and showSelChip() rebuild their markup, so the + buttons
+    // re-derive their state from the stack rather than remembering it.
+    function syncPinBtns(){
+        document.querySelectorAll('.nrow .pinb').forEach(b=>{
+            const on=pins.has(b.dataset.pin);
+            b.classList.toggle('on',on);
+            b.textContent=on?'\u2212':'\uff0b';
+            b.title=on?'remove from the stack':'add to the stack';
+        });
+        const b=document.getElementById('selPin');
+        if(b){
+            const on=!!selId&&pins.has(selId);
+            b.classList.toggle('on',on);
+            b.textContent=on?'\u2212':'\uff0b';
+            b.title=(on?'remove from the stack':'add to the stack')+' (P)';
+        }
+    }
+    document.getElementById('pinAll').onclick=()=>pinAllOn(true);
+    document.getElementById('pinNone').onclick=()=>pinAllOn(false);
+    document.getElementById('pinClr').onclick=pinClear;
+    document.getElementById('selPin').onclick=()=>{ if(selId) pinSet(selId); };
+    let stackPicks=false;
+    document.getElementById('tStack').onchange=e=>{
+        stackPicks=e.target.checked;
+        if(stackPicks&&selId) pinAdd(selId);
+    };
+    addEventListener('keydown',e=>{
+        if(e.key!=='p'&&e.key!=='P') return;
+        const t=e.target.tagName;
+        if(t==='INPUT'||t==='TEXTAREA'||t==='SELECT') return;   // never steal typing
+        if(!selId) return;
+        e.preventDefault(); pinSet(selId);
+    });
 
     // Step through the neurons of a chosen group one at a time, instead of
     // hunting for each soma in the 3D view.  Arrow keys drive it too.
@@ -1190,7 +1358,8 @@
             `<span class="id">${id}</span>`+
             `<span class="tg">${a==='SUB'?subTag(id):''}${Math.round(n.len_um/1000)}mm `+
             `${st?`<span class="st ${st}">${st}</span>`:''}`+
-            `${q.notes?'<i class="fa-solid fa-note-sticky ni"></i>':''}</span></div>`;
+            `${q.notes?'<i class="fa-solid fa-note-sticky ni"></i>':''}</span>`+
+            `<span class="pinb" data-pin="${id}" title="add to the stack">\uff0b</span></div>`;
     }
     function renderList(){
         let total=0;
@@ -1258,6 +1427,9 @@
         document.querySelectorAll('.nrow').forEach(r=>r.onclick=()=>{
             navArm(r.dataset.k); select(r.dataset.id);
         });
+        document.querySelectorAll('.nrow .pinb').forEach(b=>b.onclick=ev=>{
+            ev.stopPropagation(); pinSet(b.dataset.pin);
+        });
         syncArborButtons();
     }
     // renderList() rebuilds innerHTML, so freshly created buttons lose their
@@ -1275,6 +1447,7 @@
             const on=regionArbors.has('a:'+b.dataset.a)||arborPending.has('a:'+b.dataset.a);
             b.classList.toggle('on',on); b.textContent=on?'\u25a0':'\u2197';
         });
+        syncPinBtns();
     }
     ['search','fStatus','fSort','fMorph'].forEach(id=>document.getElementById(id).addEventListener('input',renderList));
 
@@ -1313,6 +1486,7 @@
         }
         // merged group sets bake colour in, so drop any that contain SUB
         for(const k of [...regionArbors.keys()]) removeArborSet(k);
+        if([...pins.keys()].some(id=>NE[id]&&NE[id].area==='SUB')) pinRebuild();
         document.querySelectorAll('.arb,.ab.swc,.sgvis,[data-sg-vis]').forEach(b=>{
             b.classList.remove('on');
             if(b.classList.contains('ab')||b.classList.contains('sgvis')) b.textContent='\u2197';
@@ -1570,7 +1744,10 @@
         deselect();
     });
     document.getElementById('clearBtn').onclick=()=>{ clearAllArbors(); renderList(); updateHud(); };
-    document.getElementById('tArbComp').onchange=e=>{arborComp=e.target.checked;applyArborMat();};
+    document.getElementById('tArbComp').onchange=e=>{
+        arborComp=e.target.checked; applyArborMat();
+        if(pins.size) pinRebuild();              // stacked picks bake colour in
+    };
     document.getElementById('tCcf').onchange=e=>{
         kindOn.ccf=e.target.checked;
         // turning the layer on with every structure hidden would do nothing
@@ -1662,6 +1839,9 @@
         root.add(brain);
         await loadSomaCcf();
         buildSomas(); buildLegend(); buildSubLegend(); renderList(); updateHud(); renderBatch();
+        // a stack is assembled by hand over a long session, so it survives a reload
+        try{ for(const id of JSON.parse(localStorage.getItem(SKEY)||'[]')) await pinAdd(id); }
+        catch(e){ console.warn('stack not restored',e); }
         sceneBox=new THREE.Box3();
         for(const id of order){const s=NE[id].soma;sceneBox.expandByPoint(new THREE.Vector3(s[0],s[1],s[2]));}
         const sz=sceneBox.getSize(new THREE.Vector3()).length();
