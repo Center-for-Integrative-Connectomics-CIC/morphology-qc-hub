@@ -22,11 +22,21 @@ DATA = os.path.join(HERE, "data")
 SWCOUT = os.path.join(DATA, "swc")
 SRCOUT = os.path.join(DATA, "swc_src")
 
-AREAS = ["CA1", "CA2", "DG", "POST", "PRE", "PARA"]
-AREA_COLOR = {"CA1": "#f2762e", "CA2": "#e0403a", "DG": "#f2b705",
-              "POST": "#2e9e57", "PRE": "#2aa4e0", "PARA": "#c840c8"}
-AREA_DIR = {"CA1": "hpf_ca1"}
+AREAS = ["CA1", "CA2", "CA3", "DG", "SUB", "POST", "PRE", "PARA"]
+AREA_COLOR = {"CA1": "#f2762e", "CA2": "#e0403a", "CA3": "#7a5cf0", "DG": "#f2b705",
+              "SUB": "#15b8a6", "POST": "#2e9e57", "PRE": "#2aa4e0", "PARA": "#c840c8"}
+
+# The curated HF-style dataset supersedes the per-area folders: it is a strict
+# superset (every one of the previous 3,022 neurons appears in it, with no area
+# disagreements), and it carries region, morph_type and QC metadata per neuron.
+# When present it becomes the single source of truth, so ids follow its bare
+# convention rather than the old *_labeled / *_edited suffixes.
+HFSET = os.environ.get("HF_LABELED",
+                       "/Users/ybb/Desktop/swc_to_lablel/HF_hpf_labeled_swc")
+AREA_DIR = {"CA1": "hpf_ca1", "CA3": "CA3_labeled"}
 AREA_GLOB = {"CA1": "*_edited.swc"}
+# areas whose sets live somewhere other than LABELED_SETS
+AREA_ROOT = {"CA3": DATA}
 TYPE_NAME = {1: "soma", 2: "axon", 3: "dendrite", 4: "apical", 0: "undef", 10: "c10", 11: "c11", 12: "c12"}
 EPS_UM = 6.0
 
@@ -145,17 +155,91 @@ def link_source(fn, nid):
         import shutil; shutil.copy2(fn, dst)
 
 
+def ingest_hf(neurons):
+    """Build from HFSET/metadata.csv plus the saustad2026_SUB section."""
+    import csv
+    tot = 0
+    rows = []
+    with open(os.path.join(HFSET, "metadata.csv")) as fh:
+        for r in csv.DictReader(fh):
+            rows.append(dict(nid=r["neuron_id"], area=r["region"],
+                             morph=r["morph_type"], rel=r["swc_path"],
+                             extra=dict(qc_flag=r.get("qc_flag", ""),
+                                        source_batch=r.get("source_batch", ""),
+                                        source_set=r.get("source_set", ""),
+                                        multi_fragment=r.get("multi_fragment") == "True")))
+    sub_meta = os.path.join(HFSET, "saustad2026_SUB", "metadata.csv")
+    if os.path.exists(sub_meta):
+        with open(sub_meta) as fh:
+            for r in csv.DictReader(fh):
+                # the authors' own labels, carried through for the info panel
+                rows.append(dict(nid=r["neuron_id"], area="SUB", morph="sub_ref",
+                                 rel=r["swc_path"],
+                                 extra=dict(column=r.get("column", ""),
+                                            sub_layer=r.get("sub_layer", ""),
+                                            cls=r.get("cls", ""),
+                                            targets=r.get("targets", ""),
+                                            n_targets=r.get("n_targets", ""))))
+    print(f"[HF] {len(rows)} neurons listed in metadata")
+
+    seen, done, fail = {}, 0, 0
+    for i, r in enumerate(rows):
+        nid = r["nid"]
+        if nid in neurons or nid in seen:
+            continue                                  # dedupe by id
+        fn = os.path.join(HFSET, r["rel"])
+        if not os.path.exists(fn):
+            fail += 1
+            continue
+        try:
+            P, E, T, soma, st = process(fn)
+        except Exception as e:
+            print("  fail", nid, repr(e)); fail += 1; continue
+        write_arbor(os.path.join(SWCOUT, nid + ".bin"), P, E, T)
+        link_source(fn, nid)
+        tot += os.path.getsize(os.path.join(SWCOUT, nid + ".bin"))
+        neurons[nid] = dict(id=nid, area=r["area"], morph_type=r["morph"],
+                            set=r["extra"].get("source_set", "") or r["morph"],
+                            src=f"data/swc_src/{nid}.swc",
+                            soma=[round(float(v), 4) for v in soma],
+                            np=int(len(P)), ne=int(len(E)), meta=r["extra"], **st)
+        seen[nid] = 1; done += 1
+        if done % 250 == 0:
+            print(f"   {done} built ({i+1}/{len(rows)}) {nid}", flush=True)
+    print(f"[HF] built {done}, skipped-existing {len(rows)-done-fail}, failed/missing {fail}")
+    return tot
+
+
 def main():
     os.makedirs(SWCOUT, exist_ok=True)
     os.makedirs(SRCOUT, exist_ok=True)
     write_mesh(os.path.join(DATA, "brain.bin"),
                to_display(_root_V).astype(np.float32), _root_F.astype(np.uint32))
 
+    # Incremental by default: reuse any neuron whose .bin and source copy are
+    # already on disk, so adding an area costs only that area.  REBUILD=1 forces
+    # a full pass.
     neurons = {}; tot = 0
+    kept = 0
+    if not os.environ.get("REBUILD") and os.path.exists(os.path.join(DATA, "neurons.json")):
+        prev = json.load(open(os.path.join(DATA, "neurons.json"))).get("neurons", {})
+        for nid, rec in prev.items():
+            if os.path.exists(os.path.join(SWCOUT, nid + ".bin")):
+                neurons[nid] = rec
+                kept += 1
+        print(f"reusing {kept} already-built neurons (REBUILD=1 to redo them)")
+
+    if os.path.isdir(HFSET) and os.path.exists(os.path.join(HFSET, "metadata.csv")):
+        tot += ingest_hf(neurons)
+        write_manifest(neurons, tot)
+        return
+
     for area in AREAS:
         folder = AREA_DIR.get(area, area); pattern = AREA_GLOB.get(area, "*_labeled.swc")
-        files = sorted(glob.glob(os.path.join(LSET, folder, "**", pattern), recursive=True))
-        print(f"[{area}] {len(files)} {pattern} in {folder}/")
+        root = AREA_ROOT.get(area, LSET)
+        files = sorted(glob.glob(os.path.join(root, folder, "**", pattern), recursive=True))
+        todo = sum(1 for f in files if os.path.basename(f)[:-4] not in neurons)
+        print(f"[{area}] {len(files)} {pattern} in {folder}/  ({todo} to build)")
         for i, fn in enumerate(files):
             nid = os.path.basename(fn)[:-4]
             if nid in neurons:
@@ -174,12 +258,19 @@ def main():
                                 np=int(len(P)), ne=int(len(E)), **st)
             if i % 100 == 0: print(f"   {i}/{len(files)} {nid} ({len(P)} pts)")
 
+    write_manifest(neurons, tot)
+
+
+def write_manifest(neurons, tot):
     out = dict(areaColor=AREA_COLOR, areas=AREAS,
                counts={a: sum(1 for n in neurons.values() if n["area"] == a) for a in AREAS},
+               morphCounts={m: sum(1 for n in neurons.values() if n.get("morph_type") == m)
+                            for m in sorted({n.get("morph_type", "") for n in neurons.values()})},
                neurons=neurons)
     json.dump(out, open(os.path.join(DATA, "neurons.json"), "w"))
     print(f"\nwrote {len(neurons)} neuron bins ({tot/1e6:.1f} MB), brain.bin, neurons.json")
-    print("counts:", out["counts"], "total", len(neurons))
+    print("counts:", out["counts"])
+    print("morph :", out["morphCounts"], "total", len(neurons))
 
 
 if __name__ == "__main__":
