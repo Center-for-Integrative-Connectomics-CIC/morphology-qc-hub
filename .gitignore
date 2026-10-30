@@ -1,4 +1,28 @@
-data/swc_src/
 __pycache__/
 *.pyc
 .DS_Store
+
+# source SWCs and mesh inputs: large, and rebuilt from the labeled sets
+data/swc_src/
+data/mesh_src/
+data/CA3_labeled/
+
+# local working files
+to_relabel/
+data/neurons_pre_hf.json
+
+# exploratory work, kept out of the published hub
+hgea_3d/
+atlas.html
+meshes.html
+build_meshes.py
+to_rerun.py
+watch_merge.sh
+*.rrd
+data/atlas_meshes.*
+data/hgea_plates.*
+data/hgea_regions.*
+data/meshes.*
+data/soma_atlas.json
+data/to_relabel.json
+flag_relabel.py
